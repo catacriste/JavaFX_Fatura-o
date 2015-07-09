@@ -51,8 +51,27 @@ public class Main extends Application {
 	ObservableList<Faturacao> 	tabelaFaturas = FXCollections.observableArrayList();
 	ObservableList<Produto> 	tabelaProduto = FXCollections.observableArrayList();
 	ObservableList<Cliente> 	tabelaCliente = FXCollections.observableArrayList();
-	static Faturacao faturaSelecionada = null;
 	
+	//Outros
+	static Faturacao faturaSelecionada = null;
+	//----------------------ALERT DIALOG---------------------
+	Alert alert = new Alert(AlertType.ERROR);
+	Alert alertInfo = new Alert(AlertType.INFORMATION);
+	
+	
+	//Todos os layouts do projeto
+	BorderPane layoutLogin = new BorderPane();
+	GridPane layoutFormInserir = new GridPane();
+	GridPane layoutFormAlterar = new GridPane();
+	BorderPane layoutProduto = new BorderPane();
+	BorderPane layoutCliente = new BorderPane();
+	BorderPane layoutFatura = new BorderPane();
+	BorderPane layoutRoot = new BorderPane();
+	
+	//Tabelas
+	 TableView<Faturacao> tableFatura = new TableView<>();
+	 TableView<Produto> tableProdutos = new TableView<>();
+	   TableView<Cliente> tableCliente = new TableView<>();
 	public static void main(String[] args) {
 		launch(args);
 	}
@@ -60,9 +79,7 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		
 		try {
-			//----------------------ALERT DIALOG---------------------
-			Alert alert = new Alert(AlertType.ERROR);
-			Alert alertInfo = new Alert(AlertType.INFORMATION);
+			
 			
 			/*---------------------------------------MENU-------------------------------*/
 			//TODO : Fazer o menu
@@ -114,7 +131,7 @@ public class Main extends Application {
 			// TODO : Configurar os layouts e janela
 //--------------------------------------------------TABLE DAS FATURAS----------------------------------------------------
 	        //TableViews - Criação das tabelas
-	        TableView<Faturacao> tableFatura = new TableView<>();
+	       
 	        //Coluna Do Indice
 	        TableColumn<Faturacao, Integer> colunaIDFaturacao = new TableColumn<>("Índice");
 	       // colunaIDFaturacao.setMinWidth(0);		//largura em pixeis da coluna
@@ -155,7 +172,7 @@ public class Main extends Application {
 	       
 	        //Adiciona os butoes a HBOX e Hbox ao Buttom do Border Pane
 	        hBoxFatura.getChildren().addAll(btnInserirFatura,btnAlterarFatura,btnEliminarFatura);
-			BorderPane layoutFatura = new BorderPane();
+			
 	        
 	      //layoutFatura.getChildren().add(tableFatura);
 			layoutFatura.setCenter(tableFatura);
@@ -163,7 +180,7 @@ public class Main extends Application {
 			
  //--------------------------------------------------TABLE DOS PRODUTOS----------------------------------------------------
 	      //TableViews - Criação das tabelas
-	        TableView<Produto> tableProdutos = new TableView<>();
+	      
 	        //Coluna Do Indice
 	        TableColumn<Produto, Integer> colunaIDProduto = new TableColumn<>("Índice");
 	       // colunaIDFaturacao.setMinWidth(0);		//largura em pixeis da coluna
@@ -196,14 +213,14 @@ public class Main extends Application {
 	        
 	        tableProdutos.getColumns().addAll(colunaIDProduto,colunaNomeProduto,colunaMarca,colunaDataValidade, colunaPreco , colunaStock);
 	        tableProdutos.setItems(tabelaProduto);
-			BorderPane layoutProduto = new BorderPane();
+			
 	        
 			//layoutProduto.getChildren().add(tableProdutos);
 			layoutProduto.setCenter(tableProdutos);;
 			
 			 //--------------------------------------------------TABLE DOS Cliente----------------------------------------------------
 		      //TableViews - Criação das tabelas
-		        TableView<Cliente> tableCliente = new TableView<>();
+		     
 		        //Coluna 
 		        TableColumn<Cliente, Integer> colunaIDCliente = new TableColumn<>("Código Civil");
 		       // colunaIDFaturacao.setMinWidth(0);		//largura em pixeis da coluna
@@ -238,7 +255,7 @@ public class Main extends Application {
 		        
 		        tableCliente.getColumns().addAll(colunaIDCliente,colunaNome,colunaNIF,colunaMorada, colunaNIB , colunaNISS);
 		        tableCliente.setItems(tabelaCliente);
-				BorderPane layoutCliente = new BorderPane();
+			
 		        
 				//layoutCliente.getChildren().add(tableCliente);
 				
@@ -260,7 +277,7 @@ public class Main extends Application {
 			Button btnOk = new Button("OK");
 
 	        //Layout GRID
-			BorderPane layoutLogin = new BorderPane();
+			
 			
 			HBox hbLoginText = new HBox(50);
 			hbLoginText.setPadding(new Insets(0,0,0,100));
@@ -291,75 +308,10 @@ public class Main extends Application {
 			layoutCenter.add(btnOk, 2, 4);
 			
 			
-			//Formulário Inserir
-			// LABEL e textField info fatura
-			//Label que fica no topo informativo
-			Label lbTopo = new Label("Informações da Fatura");
-			lbTopo.setFont(Font.font("Arial",FontWeight.BOLD, 12));
-			//-------------
-			//Label e text field do codCliente, com tooltip , se deixar o rato em cima mostra uma informação para ajuda no preenchimento
-			Label lbCodCliente = new Label("Cod Cliente");
-			TextField txtCodCliente = new TextField();
-			txtCodCliente.setTooltip(new Tooltip("Introduza o Cliente já existente na tabela clientes, se não crie um antes de criar a fatura"));
-			txtCodCliente.setPromptText("ID do cliente");
 			
-			//Data da Fatura com as mesmas definições de acima
-			Label lbDataFatura = new Label("Data da Fatura");
-			TextField txtDataFatura = new TextField();
-			txtDataFatura.setPromptText("Data de Fatura");
-			txtDataFatura.setTooltip(new Tooltip("Pode conter numeros, letras e caracteres alfanuméricos"));
-			
-			//Garantia  com as mesmas definições de acima
-			Label lbGarantia = new Label("Garantia");
-			TextField txtGarantia = new TextField();
-			txtGarantia.setPromptText("Duração da Garantia");
-			txtGarantia.setTooltip(new Tooltip("Duração da garantia, por exemplo : 2 Anos"));
-			
-			//Total com as mesmas definições de acima
-			Label lbTotal = new Label("Total");
-			TextField txtTotal = new TextField();
-			txtTotal.setPromptText("Total da fatura");
-			txtTotal.setTooltip(new Tooltip("Total da fatura apresentado em euros"));
-			
-			// label info cliente
-			Label lbCliente = new Label("Registar o Cliente");
-			Label lbNome = new Label("Nome");
-			Label lbNIF = new Label("NIF");
-			Label lbMorada = new Label("Morada");
-			Label lbNIB = new Label("NIB");
-			Label lbNISS = new Label("NISS");
-			
-			
-			GridPane layoutForm = new GridPane();
-			Button btnOKFatura = new  Button("OK");
-			Button btnCancelFatura = new Button("Cancelar");
-			//Cria um hbox por baixo do formulario para o OK e Cancelar
-			HBox layoutOkCancelFatura = new HBox(50);
-			layoutOkCancelFatura.getChildren().addAll(btnOKFatura, btnCancelFatura);
-			
-		
-			
-			
-			layoutForm.setAlignment(Pos.TOP_CENTER);
-			layoutForm.setHgap(10);
-			layoutForm.setVgap(10);
-			layoutForm.setPadding(new Insets(10, 20, 20, 20));
-			
-			//Adiciona ao layout os objetos
-			layoutForm.add(lbTopo, 1, 1);
-			layoutForm.add(lbCodCliente, 1, 2);
-			layoutForm.add(lbDataFatura,1,3);
-			layoutForm.add(lbGarantia,1,4);
-			layoutForm.add(lbTotal,1,5);
-			
-			layoutForm.add(txtCodCliente, 2, 2);
-			layoutForm.add(txtDataFatura, 2, 3);
-			layoutForm.add(txtGarantia, 2, 4);
-			layoutForm.add(txtTotal, 2, 5);
-			layoutForm.add(layoutOkCancelFatura, 2, 6);
 			//--------------------------------------------------SCENE E LAYOUT -------------------------------------------
 	        //Border Pane
-			BorderPane layoutRoot = new BorderPane();
+			
 			layoutRoot.setTop(menuBar);
 			//layoutRoot.setBottom(btnInserir);
 			//Scene ( Janela) Principal------
@@ -388,87 +340,29 @@ public class Main extends Application {
 			
 			//BUTÕES
 			btnInserirFatura.setOnAction(e->{
-			layoutRoot.setCenter(layoutForm);
+				layoutRoot.setCenter(FormFaturacaoInserir());
 			});
 			
 			
 			//Event handler de os botões da form da criação da Fatura  Ok e Cancelar
 			
-			btnOKFatura.setOnAction(e->{
-				if(txtDataFatura.getText().isEmpty() || txtCodCliente.getText().isEmpty() || txtGarantia.getText().isEmpty() || txtTotal.getText().isEmpty())
-				{
-					alert.setTitle("Erro ao criar!");
-					alert.setHeaderText("Preencha os Campos!");
-					alert.showAndWait();
-				}
-				
-				int ClientecodCivil;
-				String dataDaFatura;
-				String garantia;
-				Double total;
-				
-				ClientecodCivil = Integer.parseInt(txtCodCliente.getText());
-				dataDaFatura = txtDataFatura.getText();
-				garantia = txtGarantia.getText();
-				total = Double.parseDouble(txtTotal.getText());
-				UtilsSQLConn.mySqlDml("Insert into fatura"				// Tabela Aluno
-						+" (ClientecodCivil, DataDaFatura, Garantia,Total)"						// Nomes Colunas
-						+" Values('"+ClientecodCivil+"', '"+dataDaFatura+"', '"+garantia+"', '"+total+"')");	// Dados
-				
-				tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
-				layoutRoot.setCenter(layoutFatura);
-			});
 			
 			
-			btnCancelFatura.setOnAction(e->{
-				layoutRoot.setCenter(layoutFatura);
-			});
+			
+			
 			
 //EVENTOS DOS BOTÕES ALTERAR E OK DA FORM DO ALTERAR -----------------------------------------------------------------------------
-/*	//FORM REPETIDO APENAS PARA A ALTERAÇÃO Das Faturas
-			GridPane layoutFormFaturaAlterar = new GridPane();
-			Button btnOKFaturaAlterar = new  Button("OK");
-			Button btnCancelFaturaAlterar = new Button("Cancelar");
-			//Cria um hbox por baixo do formulario para o OK e Cancelar
-			HBox layoutOkCancelFaturaAlterar = new HBox(50);
-			layoutOkCancelFaturaAlterar.getChildren().addAll(btnOKFaturaAlterar, btnCancelFaturaAlterar);
-			
-		
-			
-			
-			layoutFormFaturaAlterar.setAlignment(Pos.TOP_CENTER);
-			layoutFormFaturaAlterar.setHgap(10);
-			layoutFormFaturaAlterar.setVgap(10);
-			layoutFormFaturaAlterar.setPadding(new Insets(10, 20, 20, 20));
-			
-			//Adiciona ao layout os objetos
-			layoutFormFaturaAlterar.add(lbTopo, 1, 1);
-			layoutFormFaturaAlterar.add(lbCodCliente, 1, 2);
-			layoutFormFaturaAlterar.add(lbDataFatura,1,3);
-			layoutFormFaturaAlterar.add(lbGarantia,1,4);
-			layoutFormFaturaAlterar.add(lbTotal,1,5);
-			
-			layoutFormFaturaAlterar.add(txtCodCliente, 2, 2);
-			layoutFormFaturaAlterar.add(txtDataFatura, 2, 3);
-			layoutFormFaturaAlterar.add(txtGarantia, 2, 4);
-			layoutFormFaturaAlterar.add(txtTotal, 2, 5);
-			layoutFormFaturaAlterar.add(layoutOkCancelFaturaAlterar, 2, 6);
-			
-			
-			*/
 			
 			btnAlterarFatura.setOnAction(e->{
-
-				ObservableList<Faturacao> itemSelecionado = tableFatura.getSelectionModel().getSelectedItems();
+				layoutRoot.setCenter(FormAlterarFaturacao());
+			/*	ObservableList<Faturacao> itemSelecionado = tableFatura.getSelectionModel().getSelectedItems();
 				
 				faturaSelecionada = itemSelecionado.get(0);
 				
 				
 				txtCodCliente.setText(String.valueOf(faturaSelecionada.getClienteCodCivil()));
-			
-			
-			
 				
+				*/
 			});
 			
 
@@ -512,13 +406,233 @@ public class Main extends Application {
 			e.printStackTrace();
 		}
 	}
-	
-	private GridPane FormFaturacaoInserir(ObservableList<Faturacao> itemSelecionado ) {
+	/*********************************************************************************************************************
+	 * Esta função é apresentada ao criar uma nova Insersão para a tabela
+	 * Apresenta os dados e  campos necessários e faz a conexão com a base de dados para inserir os dados
+	 * @return um Layout Grid Pane
+	 */
+	private GridPane FormFaturacaoInserir() {
 		
-	return null;
+		//Formulário Inserir
+		// LABEL e textField info fatura
+		//Label que fica no topo informativo
+		Label lbTopo = new Label("Informações da Fatura");
+		lbTopo.setFont(Font.font("Arial",FontWeight.BOLD, 12));
+		//-------------
+		//Label e text field do codCliente, com tooltip , se deixar o rato em cima mostra uma informação para ajuda no preenchimento
+		Label lbCodCliente = new Label("Cod Cliente");
+		TextField txtCodCliente = new TextField();
+		txtCodCliente.setTooltip(new Tooltip("Introduza o Cliente já existente na tabela clientes, se não crie um antes de criar a fatura"));
+		txtCodCliente.setPromptText("ID do cliente");
+		
+		//Data da Fatura com as mesmas definições de acima
+		Label lbDataFatura = new Label("Data da Fatura");
+		TextField txtDataFatura = new TextField();
+		txtDataFatura.setPromptText("Data de Fatura");
+		txtDataFatura.setTooltip(new Tooltip("Pode conter numeros, letras e caracteres alfanuméricos"));
+		
+		//Garantia  com as mesmas definições de acima
+		Label lbGarantia = new Label("Garantia");
+		TextField txtGarantia = new TextField();
+		txtGarantia.setPromptText("Duração da Garantia");
+		txtGarantia.setTooltip(new Tooltip("Duração da garantia, por exemplo : 2 Anos"));
+		
+		//Total com as mesmas definições de acima
+		Label lbTotal = new Label("Total");
+		TextField txtTotal = new TextField();
+		txtTotal.setPromptText("Total da fatura");
+		txtTotal.setTooltip(new Tooltip("Total da fatura apresentado em euros"));
+		
+		
+		
+		
+		Button btnOKFatura = new  Button("OK");
+		Button btnCancelFatura = new Button("Cancelar");
+		//Cria um hbox por baixo do formulario para o OK e Cancelar
+		HBox layoutOkCancelFatura = new HBox(50);
+		layoutOkCancelFatura.getChildren().addAll(btnOKFatura, btnCancelFatura);
+		
 	
+		
+		
+		layoutFormInserir.setAlignment(Pos.TOP_CENTER);
+		layoutFormInserir.setHgap(10);
+		layoutFormInserir.setVgap(10);
+		layoutFormInserir.setPadding(new Insets(10, 20, 20, 20));
+		
+		//Adiciona ao layout os objetos
+		layoutFormInserir.add(lbTopo, 1, 1);
+		layoutFormInserir.add(lbCodCliente, 1, 2);
+		layoutFormInserir.add(lbDataFatura,1,3);
+		layoutFormInserir.add(lbGarantia,1,4);
+		layoutFormInserir.add(lbTotal,1,5);
+		
+		layoutFormInserir.add(txtCodCliente, 2, 2);
+		layoutFormInserir.add(txtDataFatura, 2, 3);
+		layoutFormInserir.add(txtGarantia, 2, 4);
+		layoutFormInserir.add(txtTotal, 2, 5);
+		layoutFormInserir.add(layoutOkCancelFatura, 2, 6);
+		
+		btnOKFatura.setOnAction(e->{
+			if(txtDataFatura.getText().isEmpty() || txtCodCliente.getText().isEmpty() || txtGarantia.getText().isEmpty() || txtTotal.getText().isEmpty())
+			{
+				alert.setTitle("Erro ao criar!");
+				alert.setHeaderText("Preencha os Campos!");
+				alert.showAndWait();
+			}
+			
+			int ClientecodCivil;
+			String dataDaFatura;
+			String garantia;
+			Double total;
+			try {
+				ClientecodCivil = Integer.parseInt(txtCodCliente.getText());
+			
+			
+			dataDaFatura = txtDataFatura.getText();
+			garantia = txtGarantia.getText();
+			total = Double.parseDouble(txtTotal.getText());
+			
+			//Chama a função de outra classe para executar o comando Insert para a base de dados do forumlário
+			UtilsSQLConn.mySqlDml("Insert into fatura"				
+					+" (ClientecodCivil, DataDaFatura, Garantia,Total)"						
+					+" Values('"+ClientecodCivil+"', '"+dataDaFatura+"', '"+garantia+"', '"+total+"')");
+			
+			//Trata da exeção de tentar converter uma string vazia em um inteiro
+			} catch (NumberFormatException e2) {
+				alert.setTitle("Exeption! ");
+				alert.setHeaderText("Tentou converter para um numero um string vazia");
+				alert.showAndWait();
+			}
+			tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
+			layoutRoot.setCenter(layoutFatura);
+		});
+		
+		//Cancela o preenchimento da form mas volta a atualizar a tabela
+		btnCancelFatura.setOnAction(e->{
+			layoutRoot.setCenter(layoutFatura);
+			tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
+		});
+		return layoutFormInserir;
+		
 	
 	}
+	
+	/*****************************************************
+	 * Ação de alterar um dado  na tabela para a faturação
+	 * @return
+	 */
+	
+	private GridPane FormAlterarFaturacao() {
+		
+		//Formulário Inserir
+				// LABEL e textField info fatura
+				//Label que fica no topo informativo
+				Label lbTopo = new Label("Informações da Fatura");
+				lbTopo.setFont(Font.font("Arial",FontWeight.BOLD, 12));
+				//-------------
+				//Label e text field do codCliente, com tooltip , se deixar o rato em cima mostra uma informação para ajuda no preenchimento
+				Label lbCodCliente = new Label("Cod Cliente");
+				TextField txtCodCliente = new TextField();
+				txtCodCliente.setTooltip(new Tooltip("Introduza o Cliente já existente na tabela clientes, se não crie um antes de criar a fatura"));
+				txtCodCliente.setPromptText("ID do cliente");
+				
+				//Data da Fatura com as mesmas definições de acima
+				Label lbDataFatura = new Label("Data da Fatura");
+				TextField txtDataFatura = new TextField();
+				txtDataFatura.setPromptText("Data de Fatura");
+				txtDataFatura.setTooltip(new Tooltip("Pode conter numeros, letras e caracteres alfanuméricos"));
+				
+				//Garantia  com as mesmas definições de acima
+				Label lbGarantia = new Label("Garantia");
+				TextField txtGarantia = new TextField();
+				txtGarantia.setPromptText("Duração da Garantia");
+				txtGarantia.setTooltip(new Tooltip("Duração da garantia, por exemplo : 2 Anos"));
+				
+				//Total com as mesmas definições de acima
+				Label lbTotal = new Label("Total");
+				TextField txtTotal = new TextField();
+				txtTotal.setPromptText("Total da fatura");
+				txtTotal.setTooltip(new Tooltip("Total da fatura apresentado em euros"));
+				
+				
+				Button btnOKFatura = new  Button("OK");
+				Button btnCancelFatura = new Button("Cancelar");
+				//Cria um hbox por baixo do formulario para o OK e Cancelar
+				HBox layoutOkCancelFatura = new HBox(50);
+				layoutOkCancelFatura.getChildren().addAll(btnOKFatura, btnCancelFatura);
+
+				layoutFormAlterar.setAlignment(Pos.TOP_CENTER);
+				layoutFormAlterar.setHgap(10);
+				layoutFormAlterar.setVgap(10);
+				layoutFormAlterar.setPadding(new Insets(10, 20, 20, 20));
+				
+				//Adiciona ao layout os objetos
+				layoutFormAlterar.add(lbTopo, 1, 1);
+				layoutFormAlterar.add(lbCodCliente, 1, 2);
+				layoutFormAlterar.add(lbDataFatura,1,3);
+				layoutFormAlterar.add(lbGarantia,1,4);
+				layoutFormAlterar.add(lbTotal,1,5);
+				
+				layoutFormAlterar.add(txtCodCliente, 2, 2);
+				layoutFormAlterar.add(txtDataFatura, 2, 3);
+				layoutFormAlterar.add(txtGarantia, 2, 4);
+				layoutFormAlterar.add(txtTotal, 2, 5);
+				layoutFormAlterar.add(layoutOkCancelFatura, 2, 6);
+				
+				ObservableList<Faturacao> itemSelecionado = tableFatura.getSelectionModel().getSelectedItems();
+				
+				faturaSelecionada = itemSelecionado.get(0);
+				
+				
+				txtCodCliente.setText(String.valueOf(faturaSelecionada.getClienteCodCivil()));
+				txtDataFatura.setText(faturaSelecionada.getDataDaFatura());
+				txtGarantia.setText(faturaSelecionada.getGarantia());
+				txtTotal.setText(String.valueOf(faturaSelecionada.getTotal()));
+				
+				
+				//Metodo ok executa o código SQL
+				btnOKFatura.setOnAction(e->{
+					//Recebe os dados contidos nas textFields
+					int codFatura;					
+					int ClientecodCivil;
+					String dataDaFatura;
+					String garantia;
+					Double total;
+					//O utilizador não pode alterar o código de Fatura , porém ela é reentroduzida a já existente sem alterar
+					codFatura = faturaSelecionada.getCodFatura();
+					//Try catch para exeções
+					try {
+						ClientecodCivil = Integer.parseInt(txtCodCliente.getText());
+					
+					
+					dataDaFatura = txtDataFatura.getText();
+					garantia = txtGarantia.getText();
+					total = Double.parseDouble(txtTotal.getText());
+					//Chama  a função de outra classe e executa o comando UDADATE na base de dados MySql
+					UtilsSQLConn.mySqlDml("UPDATE `fatura` SET `codFatura`= "+codFatura+",`ClientecodCivil`= " +ClientecodCivil+ ",`DataDaFatura`= '"+dataDaFatura+"',`Garantia`= '"+garantia+"' ,`Total`= "+total+" WHERE codFatura = " +codFatura);	
+					
+					
+					//Trata a exeção ao tentar converter uma string vazia para um numero
+					} catch (NumberFormatException e2) {
+						alert.setTitle("Exeption! ");
+						alert.setHeaderText("Tentou converter para um numero um string vazia");
+						alert.showAndWait();
+					}
+					//Por fim volta a apresentar a tabela com os dados atualizados e alterados
+					tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
+					layoutRoot.setCenter(layoutFatura);
+				});
+				//Butão de cancelar no formulário volta para a Tabela voltando a fazer uma query à DB
+				btnCancelFatura.setOnAction(e->{
+					layoutRoot.setCenter(layoutFatura);
+					tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
+				});
+				
+				
+		return layoutFormAlterar;
+		
+	} 
 	
 	
 	
