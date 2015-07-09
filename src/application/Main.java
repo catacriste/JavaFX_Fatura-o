@@ -1,15 +1,8 @@
 package application;
 	
-import java.beans.DefaultPersistenceDelegate;
-
-
-import javax.activation.CommandObject;
-
-
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
@@ -18,8 +11,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -34,8 +25,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -57,7 +46,9 @@ public class Main extends Application {
 	ObservableList<Cliente> 	tabelaCliente = FXCollections.observableArrayList();
 	boolean msgOn = false;
 	//Outros
+	
 	static Faturacao faturaSelecionada = null;
+	static Produto produtoSelecionado = null;
 	//----------------------ALERT DIALOG---------------------
 	Alert alert = new Alert(AlertType.ERROR);
 	Alert alertInfo = new Alert(AlertType.INFORMATION);
@@ -68,15 +59,18 @@ public class Main extends Application {
 	GridPane layoutFormInserir = new GridPane();
 	GridPane layoutFormAlterar = new GridPane();
 	GridPane layoutFormInserirProduto = new GridPane();
+	GridPane layoutFormAlterarProduto = new GridPane();
 	BorderPane layoutProduto = new BorderPane();
 	BorderPane layoutCliente = new BorderPane();
 	BorderPane layoutFatura = new BorderPane();
 	BorderPane layoutRoot = new BorderPane();
 	
 	//Tabelas
-	 TableView<Faturacao> tableFatura = new TableView<>();
-	 TableView<Produto> tableProdutos = new TableView<>();
-	   TableView<Cliente> tableCliente = new TableView<>();
+	TableView<Faturacao> tableFatura = new TableView<>();
+	TableView<Produto> tableProdutos = new TableView<>();
+	TableView<Cliente> tableCliente = new TableView<>();
+	
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
@@ -119,13 +113,13 @@ public class Main extends Application {
 				if(on.isSelected())
 				{
 					UtilsSQLConn.msgON = true;
-					boolean msgOn = true;
+					msgOn = true;
 				}	
 			});
 			off.setOnAction(e->{
 				if (off.isSelected()) {
 					UtilsSQLConn.msgON = false;
-					boolean msgOn = false;
+					msgOn = false;
 				}
 			});
 			
@@ -347,18 +341,42 @@ public class Main extends Application {
 			//-------------------MENUS and BUTTONS EVENT HANDLERS ----------------------
 			menuFaturaMostrar.setOnAction(e->{
 	        	layoutRoot.setCenter(layoutFatura);
-	        	tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
+	        	try {
+	        		tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
+				
+	        	} catch (NullPointerException e2) {
+					alert.setTitle("Exception ");
+					alert.setHeaderText("Erro de Ligação à BD");
+					alert.setContentText("Ponteiro Nulo");
+					alert.showAndWait();
+				}
+	        	
 	        	
 	        });
 			menuProdutoMostrar.setOnAction(e->{
 	        	layoutRoot.setCenter(layoutProduto);
-	        	tabelaProduto.setAll(UtilsSQLConn.mySqlQweryProduto("SELECT * FROM `produto`"));
+	        	try {
+	        		tabelaProduto.setAll(UtilsSQLConn.mySqlQweryProduto("SELECT * FROM `produto`"));
+				} catch (NullPointerException e2) {
+					alert.setTitle("Exception ");
+					alert.setHeaderText("Erro de Ligação à BD");
+					alert.setContentText("Ponteiro Nulo");
+					alert.showAndWait();
+				}
+	        	
 	        	
 	        });
 			
 			menuClienteMostrar.setOnAction(e->{
-	        	layoutRoot.setCenter(layoutCliente);
-	        tabelaCliente.setAll(UtilsSQLConn.mySqlQweryCliente("SELECT * FROM `cliente`"));
+	        layoutRoot.setCenter(layoutCliente);
+	        try {
+	        	tabelaCliente.setAll(UtilsSQLConn.mySqlQweryCliente("SELECT * FROM `cliente`"));
+			} catch (NullPointerException e2) {
+				alert.setTitle("Exception ");
+				alert.setHeaderText("Erro de Ligação à BD");
+				alert.setContentText("Ponteiro Nulo");
+				alert.showAndWait();
+			}
 	        	
 	        });
 			
@@ -372,7 +390,7 @@ public class Main extends Application {
 			btnAlterarFatura.setOnAction(e->{
 				try {
 					layoutRoot.setCenter(FormAlterarFaturacao());
-				} catch (Exception e2) {
+				} catch (NullPointerException e2) {
 					alert.setTitle("Exception ");
 					alert.setHeaderText("Não selecionou nenhum dado da tabela");
 					alert.setContentText("");
@@ -405,10 +423,44 @@ public class Main extends Application {
 			});
 			
 //--------------------------------------------Inserir, Alterar e Eliminar Produtos-------------------------------------------------
+			//Metodo setOnAction Inserir
 			btnInserirProduto.setOnAction(e->{
 				layoutRoot.setCenter(FormInserirProduto());
 			});
 			
+			//Meteodo setOnAction Alterar
+			btnAlterarProduto.setOnAction(e-> {
+				try {
+					layoutRoot.setCenter(FormAlterarProduto());
+				} catch (NullPointerException e2) {
+					alert.setTitle("Exception ");
+					alert.setHeaderText("Não selecionou nenhum dado da tabela");
+					alert.setContentText("");
+					alert.showAndWait();
+				}
+				
+			});
+			
+			//Metodo setOnAction Eliminar
+			btnEliminarProduto.setOnAction(e->{
+				int codProduto;
+				
+				ObservableList<Produto> itemSelecionado = tableProdutos.getSelectionModel().getSelectedItems();
+				produtoSelecionado = itemSelecionado.get(0);
+				
+				try {
+				
+					codProduto = produtoSelecionado.getCodProduto();
+					UtilsSQLConn.mySqlDml("Delete from produto where codProduto = "+codProduto+" ");
+					
+				} catch (NullPointerException e2) {
+					alert.setTitle("Exception ");
+					alert.setHeaderText("Não selecionou nenhum dado da tabela");
+					alert.setContentText("");
+					alert.showAndWait();
+				}
+				tabelaProduto.setAll(UtilsSQLConn.mySqlQweryProduto("SELECT * FROM `produto`"));
+			});
 //---------------------------------------------------------------------------------------------------------------
 			//Método do botão OK - LOGIN
 			btnOk.setOnAction(e->{
@@ -438,8 +490,16 @@ public class Main extends Application {
 					alert.setContentText("Senha ou Password Incorretos");
 					alert.showAndWait();
 				}
-				layoutRoot.setCenter(layoutFatura);
-				tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
+				try {
+					layoutRoot.setCenter(layoutFatura);
+					tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
+				} catch (NullPointerException e2) {
+					alert.setTitle("Exception ");
+					alert.setHeaderText("Erro de ligação à BD ");
+					alert.setContentText("O ponteiro apontou para um NULL");
+					alert.showAndWait();
+				}
+				
 			});
 			primaryStage.setMinHeight(180);
 			primaryStage.setMinWidth(330);
@@ -769,10 +829,26 @@ public class Main extends Application {
 			dataValidade = txtDataDeValidade.getText();
 			preco = txtPreco.getText();
 			stock = txtStock.getText();
+			try {
+				UtilsSQLConn.mySqlDml("INSERT INTO `produto`(`codProduto`, `NomeProduto`, `Marca`, `DataValidade`, `Preco`, `Stock`) VALUES (Null,'"+nomeProduto+"','"+marca+"','"+dataValidade+"','"+preco+"','"+stock+"')");
+			} catch (NullPointerException e2) {
+				alert.setTitle("Exception ");
+				alert.setHeaderText("Erro de Ligação à BD");
+				alert.setContentText("Ponteiro Nulo");
+				alert.showAndWait();
+			}
 			
-			UtilsSQLConn.mySqlDml("INSERT INTO `produto`(`codProduto`, `NomeProduto`, `Marca`, `DataValidade`, `Preco`, `Stock`) VALUES (Null,'"+nomeProduto+"','"+marca+"','"+dataValidade+"','"+preco+"','"+stock+"')");
 			layoutRoot.setCenter(layoutProduto);
-        	tabelaProduto.setAll(UtilsSQLConn.mySqlQweryProduto("SELECT * FROM `produto`"));
+			
+			try {
+				tabelaProduto.setAll(UtilsSQLConn.mySqlQweryProduto("SELECT * FROM `produto`"));
+			} catch (NullPointerException e2) {
+				alert.setTitle("Exception ");
+				alert.setHeaderText("Erro de Ligação à BD");
+				alert.setContentText("Ponteiro Nulo");
+				alert.showAndWait();
+			}
+        	
 			}
 		});
 		
@@ -782,6 +858,104 @@ public class Main extends Application {
 		
 		
 		return layoutFormInserirProduto;
+	}
+	
+	private GridPane FormAlterarProduto() {
+		//Label do topo informativa
+				Label lbTopo = new Label("Informações do Produto");
+				lbTopo.setFont(Font.font("Arial",FontWeight.BOLD, 12));
+				
+				//Label Nome do Produto + TextField
+				Label lbNomeProduto = new Label("Nome Produto");
+				TextField txtNomeProduto = new TextField();
+				txtNomeProduto.setPromptText("Nome do Produto");
+				
+				//Label Marca + Text Field
+				Label lbMarca = new Label("Marca");
+				TextField txtMarca = new TextField();
+				txtMarca.setPromptText("Marca do Produto");
+				//Label Data de Validade + Text Field
+				Label lbDataValidade = new Label("Data de Validade");
+				TextField txtDataDeValidade = new TextField();
+				txtDataDeValidade.setPromptText("Data de Validade");
+				
+				//Label Preço + TextField
+				Label lbPreco = new Label("Preço");
+				TextField txtPreco = new TextField();
+				txtPreco.setPromptText("Preço do Produto");
+				
+				
+				//Label Stock + TextField
+				Label lbStock = new Label("Stock");
+				TextField txtStock = new TextField();
+				txtStock.setPromptText("Quantidade em Stock");
+				
+				//Botões OK e Cancelar
+				Button btnOkFormProduto = new Button("OK");
+				Button btnCancelFormProduto = new Button("Cancelar");
+				btnCancelFormProduto.setCancelButton(true);
+				btnCancelFormProduto.setCancelButton(true);
+				
+				//Layout horizontal para alinhar os 2 botoes
+				HBox layoutOkCancelProduto = new HBox(55);
+				layoutOkCancelProduto.getChildren().addAll(btnOkFormProduto, btnCancelFormProduto);
+				
+				layoutFormAlterarProduto.setAlignment(Pos.TOP_LEFT);
+				layoutFormAlterarProduto.setHgap(10);
+				layoutFormAlterarProduto.setVgap(10);
+				layoutFormAlterarProduto.setPadding(new Insets(10, 20, 20, 20));
+				
+				layoutFormAlterarProduto.add(lbTopo, 1, 1);
+				layoutFormAlterarProduto.add(lbNomeProduto, 1, 2);
+				layoutFormAlterarProduto.add(lbMarca,1,3);
+				layoutFormAlterarProduto.add(lbDataValidade,1,4);
+				layoutFormAlterarProduto.add(lbPreco,1,5);
+				layoutFormAlterarProduto.add(lbStock,1,6);
+				
+				layoutFormAlterarProduto.add(txtNomeProduto, 2, 2);
+				layoutFormAlterarProduto.add(txtMarca, 2,3);
+				layoutFormAlterarProduto.add(txtDataDeValidade,2,4);
+				layoutFormAlterarProduto.add(txtPreco,2,5);
+				layoutFormAlterarProduto.add(txtStock,2,6);
+				layoutFormAlterarProduto.add(layoutOkCancelProduto, 2, 7);
+				
+
+				ObservableList<Produto> itemSelecionado = tableProdutos.getSelectionModel().getSelectedItems();
+				
+				produtoSelecionado = itemSelecionado.get(0);
+				
+				txtNomeProduto.setText(produtoSelecionado.getNomeProduto());
+				txtMarca.setText(produtoSelecionado.getMarca());
+				txtDataDeValidade.setText(produtoSelecionado.getDataValidade());
+				txtPreco.setText(produtoSelecionado.getPreco());
+				txtStock.setText(produtoSelecionado.getStock());
+				
+				btnOkFormProduto.setOnAction(e->{
+					int codProduto;
+					String nomeProduto;
+					String marca;
+					String dataValidade;
+					String preco;
+					String stock;
+					
+					codProduto = produtoSelecionado.getCodProduto();
+					nomeProduto = txtNomeProduto.getText();
+					marca = txtMarca.getText();
+					dataValidade = txtDataDeValidade.getText();
+					preco = txtPreco.getText();
+					stock = txtStock.getText();
+					
+					
+					UtilsSQLConn.mySqlDml("UPDATE `produto` SET `codProduto`= "+codProduto+",`NomeProduto`= '" +nomeProduto+ "',`Marca`= '"+marca+"',`DataValidade`= '"+dataValidade+"' ,`Preco`= '"+preco+"' ,`Stock`= '"+stock+"' WHERE codProduto = " +codProduto);
+					layoutRoot.setCenter(layoutProduto);
+		        	tabelaProduto.setAll(UtilsSQLConn.mySqlQweryProduto("SELECT * FROM `produto`"));
+				});
+				
+				btnCancelFormProduto.setOnAction(e->{
+					layoutRoot.setCenter(layoutProduto);
+				});
+		return layoutFormAlterarProduto;
+		
 	}
 	
 	
