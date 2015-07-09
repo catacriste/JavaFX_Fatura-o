@@ -67,6 +67,7 @@ public class Main extends Application {
 	BorderPane layoutLogin = new BorderPane();
 	GridPane layoutFormInserir = new GridPane();
 	GridPane layoutFormAlterar = new GridPane();
+	GridPane layoutFormInserirProduto = new GridPane();
 	BorderPane layoutProduto = new BorderPane();
 	BorderPane layoutCliente = new BorderPane();
 	BorderPane layoutFatura = new BorderPane();
@@ -218,12 +219,28 @@ public class Main extends Application {
 	        
 	        
 	        
+	        
 	        tableProdutos.getColumns().addAll(colunaIDProduto,colunaNomeProduto,colunaMarca,colunaDataValidade, colunaPreco , colunaStock);
 	        tableProdutos.setItems(tabelaProduto);
 			
+	        HBox hBoxProduto = new HBox(10);
+	        hBoxProduto.setPadding(new Insets(10,0,10,250));
+	        hBoxProduto.setStyle("-fx-background-color: #005CB8");
+	        
+	        //Os 3 Butões , inserir ,alterar e eliminar
+	        Button btnInserirProduto = new Button("Inserir");
+	        //btnInserirFatura.setPadding(value);
+	        Button btnAlterarProduto = new Button("Alterar");
+	        Button btnEliminarProduto = new Button("Eliminar");
+	       
+	        //Adiciona os butoes a HBOX e Hbox ao Buttom do Border Pane
+	        hBoxProduto.getChildren().addAll(btnInserirProduto,btnAlterarProduto,btnEliminarProduto);
+			
+	        
 	        
 			//layoutProduto.getChildren().add(tableProdutos);
 			layoutProduto.setCenter(tableProdutos);;
+			layoutProduto.setBottom(hBoxProduto);
 			
 			 //--------------------------------------------------TABLE DOS Cliente----------------------------------------------------
 		      //TableViews - Criação das tabelas
@@ -314,7 +331,7 @@ public class Main extends Application {
 			layoutCenter.add(passwordFieldPassword, 2,3);
 			layoutCenter.add(btnOk, 2, 4);
 			
-			
+			btnOk.setDefaultButton(true);
 			
 			//--------------------------------------------------SCENE E LAYOUT -------------------------------------------
 	        //Border Pane
@@ -350,6 +367,8 @@ public class Main extends Application {
 				layoutRoot.setCenter(FormFaturacaoInserir());
 			});
 			
+			
+			
 			btnAlterarFatura.setOnAction(e->{
 				try {
 					layoutRoot.setCenter(FormAlterarFaturacao());
@@ -384,6 +403,12 @@ public class Main extends Application {
 				faturaSelecionada = null; // volta a meter o objeto vazio (null)
 				  
 			});
+			
+//--------------------------------------------Inserir, Alterar e Eliminar Produtos-------------------------------------------------
+			btnInserirProduto.setOnAction(e->{
+				layoutRoot.setCenter(FormInserirProduto());
+			});
+			
 //---------------------------------------------------------------------------------------------------------------
 			//Método do botão OK - LOGIN
 			btnOk.setOnAction(e->{
@@ -398,7 +423,8 @@ public class Main extends Application {
 				
 				if(checkUser.equals(userName)  && checkPw.equals(password)){
 					
-					alert.setTitle("Deu");
+					alertInfo.setTitle("Deu");
+					alertInfo.showAndWait();
 					primaryStage.setMinHeight(500);
 					primaryStage.setMinWidth(700);
 					primaryStage.setMaxHeight(564213);
@@ -531,7 +557,6 @@ public class Main extends Application {
 		//Cancela o preenchimento da form mas volta a atualizar a tabela
 		btnCancelFatura.setOnAction(e->{
 			layoutRoot.setCenter(layoutFatura);
-			tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
 		});
 		return layoutFormInserir;
 		
@@ -647,7 +672,7 @@ public class Main extends Application {
 				//Butão de cancelar no formulário volta para a Tabela voltando a fazer uma query à DB
 				btnCancelFatura.setOnAction(e->{
 					layoutRoot.setCenter(layoutFatura);
-					tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
+					//tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
 				});
 				
 				
@@ -655,6 +680,109 @@ public class Main extends Application {
 		return layoutFormAlterar;
 		
 	} 
+	
+	/************************************
+	 * Form para inserir um novo Produto na BD
+	 * Cria-se a form para preenchimento dos dados e depois faz-se um insert à BD
+	 * @return
+	 */
+	private GridPane FormInserirProduto() {
+		
+		
+		//Label do topo informativa
+		Label lbTopo = new Label("Informações do Produto");
+		lbTopo.setFont(Font.font("Arial",FontWeight.BOLD, 12));
+		
+		//Label Nome do Produto + TextField
+		Label lbNomeProduto = new Label("Nome Produto");
+		TextField txtNomeProduto = new TextField();
+		txtNomeProduto.setPromptText("Nome do Produto");
+		
+		//Label Marca + Text Field
+		Label lbMarca = new Label("Marca");
+		TextField txtMarca = new TextField();
+		txtMarca.setPromptText("Marca do Produto");
+		//Label Data de Validade + Text Field
+		Label lbDataValidade = new Label("Data de Validade");
+		TextField txtDataDeValidade = new TextField();
+		txtDataDeValidade.setPromptText("Data de Validade");
+		
+		//Label Preço + TextField
+		Label lbPreco = new Label("Preço");
+		TextField txtPreco = new TextField();
+		txtPreco.setPromptText("Preço do Produto");
+		
+		
+		//Label Stock + TextField
+		Label lbStock = new Label("Stock");
+		TextField txtStock = new TextField();
+		txtStock.setPromptText("Quantidade em Stock");
+		
+		//Botões OK e Cancelar
+		Button btnOkFormProduto = new Button("OK");
+		Button btnCancelFormProduto = new Button("Cancelar");
+		btnCancelFormProduto.setCancelButton(true);
+		
+		//Layout horizontal para alinhar os 2 botoes
+		HBox layoutOkCancelProduto = new HBox(55);
+		layoutOkCancelProduto.getChildren().addAll(btnOkFormProduto, btnCancelFormProduto);
+		
+		layoutFormInserirProduto.setAlignment(Pos.TOP_LEFT);
+		layoutFormInserirProduto.setHgap(10);
+		layoutFormInserirProduto.setVgap(10);
+		layoutFormInserirProduto.setPadding(new Insets(10, 20, 20, 20));
+		
+		layoutFormInserirProduto.add(lbTopo, 1, 1);
+		layoutFormInserirProduto.add(lbNomeProduto, 1, 2);
+		layoutFormInserirProduto.add(lbMarca,1,3);
+		layoutFormInserirProduto.add(lbDataValidade,1,4);
+		layoutFormInserirProduto.add(lbPreco,1,5);
+		layoutFormInserirProduto.add(lbStock,1,6);
+		
+		layoutFormInserirProduto.add(txtNomeProduto, 2, 2);
+		layoutFormInserirProduto.add(txtMarca, 2,3);
+		layoutFormInserirProduto.add(txtDataDeValidade,2,4);
+		layoutFormInserirProduto.add(txtPreco,2,5);
+		layoutFormInserirProduto.add(txtStock,2,6);
+		layoutFormInserirProduto.add(layoutOkCancelProduto, 2, 7);
+		
+		btnOkFormProduto.setOnAction(e->{
+			
+			//Protege os Dados
+			if(txtNomeProduto.getText().isEmpty() || txtMarca.getText().isEmpty() || txtDataDeValidade.getText().isEmpty() || txtPreco.getText().isEmpty() || txtStock.getText().isEmpty())
+			{
+				alert.setTitle("Erro ao criar!");
+				alert.setHeaderText("Preencha os Campos!");
+				alert.showAndWait();
+			}
+			else{
+			//Strings para receberem os dados das Text Field
+			String nomeProduto;
+			String marca;
+			String dataValidade;
+			String preco;
+			String stock;
+			
+			//Recebe os dados
+			nomeProduto = txtNomeProduto.getText();
+			marca = txtMarca.getText();
+			dataValidade = txtDataDeValidade.getText();
+			preco = txtPreco.getText();
+			stock = txtStock.getText();
+			
+			UtilsSQLConn.mySqlDml("INSERT INTO `produto`(`codProduto`, `NomeProduto`, `Marca`, `DataValidade`, `Preco`, `Stock`) VALUES (Null,'"+nomeProduto+"','"+marca+"','"+dataValidade+"','"+preco+"','"+stock+"')");
+			layoutRoot.setCenter(layoutProduto);
+        	tabelaProduto.setAll(UtilsSQLConn.mySqlQweryProduto("SELECT * FROM `produto`"));
+			}
+		});
+		
+		btnCancelFormProduto.setOnAction(e->{
+			layoutRoot.setCenter(layoutProduto);
+		});
+		
+		
+		return layoutFormInserirProduto;
+	}
 	
 	
 	
