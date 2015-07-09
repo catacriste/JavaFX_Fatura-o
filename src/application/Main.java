@@ -1,6 +1,10 @@
 package application;
 	
-import java.awt.CheckboxMenuItem;
+import java.beans.DefaultPersistenceDelegate;
+
+
+import javax.activation.CommandObject;
+
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -51,7 +55,7 @@ public class Main extends Application {
 	ObservableList<Faturacao> 	tabelaFaturas = FXCollections.observableArrayList();
 	ObservableList<Produto> 	tabelaProduto = FXCollections.observableArrayList();
 	ObservableList<Cliente> 	tabelaCliente = FXCollections.observableArrayList();
-	
+	boolean msgOn = false;
 	//Outros
 	static Faturacao faturaSelecionada = null;
 	//----------------------ALERT DIALOG---------------------
@@ -106,6 +110,7 @@ public class Main extends Application {
 			ToggleGroup onOffToogle = new ToggleGroup();
 			on.setToggleGroup(onOffToogle);
 			off.setToggleGroup(onOffToogle);
+			on.setSelected(msgOn);
 			
 			
 			//Condição que ativa e desativa as mensagens
@@ -113,18 +118,20 @@ public class Main extends Application {
 				if(on.isSelected())
 				{
 					UtilsSQLConn.msgON = true;
+					boolean msgOn = true;
 				}	
 			});
 			off.setOnAction(e->{
 				if (off.isSelected()) {
 					UtilsSQLConn.msgON = false;
+					boolean msgOn = false;
 				}
 			});
 			
 			
 			
 			MenuBar menuBar = new MenuBar();
-			menuBar.setStyle("-fx-background-color: #33CC33");
+			menuBar.setStyle("-fx-background-color: #0099FF");
 	        //Adiciona os menus ao menuBar
 	        menuBar.getMenus().addAll(menuFatura, menuProduto,menuCliente,msg);
 			//------------------------------JANELA E LAYOUT-----------------------------------------------------
@@ -162,7 +169,7 @@ public class Main extends Application {
 	        
 	        HBox hBoxFatura = new HBox(10);
 	        hBoxFatura.setPadding(new Insets(10,0,10,250));
-	        hBoxFatura.setStyle("-fx-background-color: #006600");
+	        hBoxFatura.setStyle("-fx-background-color: #005CB8");
 	        
 	        //Os 3 Butões , inserir ,alterar e eliminar
 	        Button btnInserirFatura = new Button("Inserir");
@@ -338,34 +345,45 @@ public class Main extends Application {
 	        	
 	        });
 			
-			//BUTÕES
+//----------------------------------------------Eventos de Inserir , Alterar e Eliminar Faturas-----------------------------------------------------
 			btnInserirFatura.setOnAction(e->{
 				layoutRoot.setCenter(FormFaturacaoInserir());
 			});
 			
-			
-			//Event handler de os botões da form da criação da Fatura  Ok e Cancelar
-			
-			
-			
-			
-			
-			
-//EVENTOS DOS BOTÕES ALTERAR E OK DA FORM DO ALTERAR -----------------------------------------------------------------------------
-			
 			btnAlterarFatura.setOnAction(e->{
-				layoutRoot.setCenter(FormAlterarFaturacao());
-			/*	ObservableList<Faturacao> itemSelecionado = tableFatura.getSelectionModel().getSelectedItems();
+				try {
+					layoutRoot.setCenter(FormAlterarFaturacao());
+				} catch (Exception e2) {
+					alert.setTitle("Exception ");
+					alert.setHeaderText("Não selecionou nenhum dado da tabela");
+					alert.setContentText("");
+					alert.showAndWait();
+				}
 				
-				faturaSelecionada = itemSelecionado.get(0);
-				
-				
-				txtCodCliente.setText(String.valueOf(faturaSelecionada.getClienteCodCivil()));
-				
-				*/
 			});
 			
+			btnEliminarFatura.setOnAction(e->{
+				//Efetua a eliminação de dados numa tabela
+				int codFatura; 				//Variável para usar no comando
 
+				ObservableList<Faturacao> itemSelecionado = tableFatura.getSelectionModel().getSelectedItems();
+				faturaSelecionada = itemSelecionado.get(0);
+				
+				try {
+					codFatura = faturaSelecionada.getCodFatura();
+					UtilsSQLConn.mySqlDml("Delete from fatura where codFatura = "+codFatura+" ");
+				} catch (NullPointerException e2) {
+					alert.setTitle("Exception ");
+					alert.setHeaderText("Não selecionou nenhum dado da tabela");
+					alert.setContentText("");
+					alert.showAndWait();
+					
+				}
+				layoutRoot.setCenter(layoutFatura);
+				tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
+				faturaSelecionada = null; // volta a meter o objeto vazio (null)
+				  
+			});
 //---------------------------------------------------------------------------------------------------------------
 			//Método do botão OK - LOGIN
 			btnOk.setOnAction(e->{
@@ -394,6 +412,8 @@ public class Main extends Application {
 					alert.setContentText("Senha ou Password Incorretos");
 					alert.showAndWait();
 				}
+				layoutRoot.setCenter(layoutFatura);
+				tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
 			});
 			primaryStage.setMinHeight(180);
 			primaryStage.setMinWidth(330);
@@ -622,12 +642,14 @@ public class Main extends Application {
 					//Por fim volta a apresentar a tabela com os dados atualizados e alterados
 					tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
 					layoutRoot.setCenter(layoutFatura);
+					faturaSelecionada = null;
 				});
 				//Butão de cancelar no formulário volta para a Tabela voltando a fazer uma query à DB
 				btnCancelFatura.setOnAction(e->{
 					layoutRoot.setCenter(layoutFatura);
 					tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
 				});
+				
 				
 				
 		return layoutFormAlterar;

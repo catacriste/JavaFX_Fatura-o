@@ -15,6 +15,8 @@ import java.sql.Statement;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 
 
@@ -33,8 +35,9 @@ public class UtilsSQLConn {
 	static String SQLSERVER_DB_USER = "sa";								// BD user name SQLSERVER
 	static String SQLSERVER_DB_PASS = "123";							// BD password SQLSERVER
 	
-	static boolean msgON = true;										// Ativa Mensagens de controlo
-	
+	static boolean msgON = false;										// Ativa Mensagens de controlo
+	static Alert alert = new Alert(AlertType.ERROR);
+	static Alert alertInfo = new Alert(AlertType.INFORMATION);
 	/* mySqlTeste()- Cria e testa uma ligação a um SGBD MYSQL.*/
 	/*public static void mySqlTeste(){
 		try{
@@ -70,17 +73,37 @@ public class UtilsSQLConn {
 			Class.forName(MYSQL_JDBC_DRIVER).newInstance();
 			conn = DriverManager.getConnection(MYSQL_DB_URL, MYSQL_DB_USER, MYSQL_DB_PASS );
 			if(msgON){
-				Utils.alertBox("layoutLeft", "Base dados aberta");
+				alertInfo.setTitle("SQL INFO");
+				alertInfo.setHeaderText("Base dados aberta");
+				alertInfo.setContentText("");
+
+				alertInfo.showAndWait();
 			}
 		}
-		catch(SQLException ex){							// Apanha Erro da connection ou DML
-			Utils.alertBox("layoutLeft", "Erro na ligação");
+		catch(SQLException ex){								// Apanha Erro da connection ou DML
+			//Utils.alertBox("layoutLeft", "Erro na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
 		}
-		catch(ClassNotFoundException ex){				// Apanha Erro da Class.forName()
-			Utils.alertBox("layoutLeft", "Erro no Driver");
+		catch(ClassNotFoundException ex){					// Apanha Erro da Class.forName()
+			//Utils.alertBox("layoutLeft", "Erro no Driver");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+			
 		}
 		catch(Exception ex){								// Apanha todas as restantes Exceções
-			Utils.alertBox("layoutLeft", "Erro genérico na ligação");
+		//	Utils.alertBox("layoutLeft", "Erro genérico na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro genérico na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
 			ex.printStackTrace();
 		}
 		finally{
@@ -97,11 +120,16 @@ public class UtilsSQLConn {
 						temp.setGarantia(rs.getString(4));
 						temp.setTotal(rs.getDouble(5));
 						listaFatura.add(temp);
-						if(msgON){
-							Utils.alertBox("DB", "" + query +"\n CodFatura : " + temp.getCodFatura());
-						}
+					
 					}
+					if(msgON){
+						alertInfo.setTitle("SQL INFO");
+						alertInfo.setHeaderText("DB");
+						alertInfo.setContentText("Sucesso");
 
+						alertInfo.showAndWait();
+						//Utils.alertBox("DB", "" + query +"\n CodFatura : " + temp.getCodFatura());
+					}
 				}
 				shutdownConnection();
 				return listaFatura;
@@ -123,17 +151,37 @@ public class UtilsSQLConn {
 			Class.forName(MYSQL_JDBC_DRIVER).newInstance();
 			conn = DriverManager.getConnection(MYSQL_DB_URL, MYSQL_DB_USER, MYSQL_DB_PASS );
 			if(msgON){
-				Utils.alertBox("layoutLeft", "Base dados aberta");
+				alertInfo.setTitle("SQL INFO");
+				alertInfo.setHeaderText("Base dados aberta");
+				alertInfo.setContentText("");
+
+				alertInfo.showAndWait();
 			}
 		}
-		catch(SQLException ex){							// Apanha Erro da connection ou DML
-			Utils.alertBox("layoutLeft", "Erro na ligação");
+		catch(SQLException ex){								// Apanha Erro da connection ou DML
+			//Utils.alertBox("layoutLeft", "Erro na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
 		}
-		catch(ClassNotFoundException ex){				// Apanha Erro da Class.forName()
-			Utils.alertBox("layoutLeft", "Erro no Driver");
+		catch(ClassNotFoundException ex){					// Apanha Erro da Class.forName()
+			//Utils.alertBox("layoutLeft", "Erro no Driver");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+			
 		}
 		catch(Exception ex){								// Apanha todas as restantes Exceções
-			Utils.alertBox("layoutLeft", "Erro genérico na ligação");
+		//	Utils.alertBox("layoutLeft", "Erro genérico na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro genérico na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
 			ex.printStackTrace();
 		}
 		finally{
@@ -151,9 +199,16 @@ public class UtilsSQLConn {
 						temp.setPreco(rs.getString(5));
 						temp.setStock(rs.getString(6));
 						listaProduto.add(temp);
-						if(msgON){
-							Utils.alertBox("DB", "" + query +"\n CodProduto : " + temp.getCodProduto());
-						}
+						
+					}
+					if(msgON){
+						alertInfo.setTitle("SQL INFO");
+						alertInfo.setHeaderText("DB");
+						alertInfo.setContentText("Sucesso");
+
+						alertInfo.showAndWait();
+
+						//Utils.alertBox("DB", );
 					}
 
 				}
@@ -162,7 +217,11 @@ public class UtilsSQLConn {
 				
 			}
 			catch(SQLException ex){							// Apanha Erro da connection ou DML
-				Utils.alertBox("Finally", "Erro na ligação");
+				alert.setTitle("SQL INFO");
+				alert.setHeaderText("Erro na ligação");
+				alert.setContentText("FINALLY");
+
+				alert.showAndWait();
 				shutdownConnection();
 			}				
 		}
@@ -176,17 +235,37 @@ public class UtilsSQLConn {
 			Class.forName(MYSQL_JDBC_DRIVER).newInstance();
 			conn = DriverManager.getConnection(MYSQL_DB_URL, MYSQL_DB_USER, MYSQL_DB_PASS );
 			if(msgON){
-				Utils.alertBox("layoutLeft", "Base dados aberta");
+				alertInfo.setTitle("SQL INFO");
+				alertInfo.setHeaderText("Base dados aberta");
+				alertInfo.setContentText("");
+
+				alertInfo.showAndWait();
 			}
 		}
-		catch(SQLException ex){							// Apanha Erro da connection ou DML
-			Utils.alertBox("layoutLeft", "Erro na ligação");
+		catch(SQLException ex){								// Apanha Erro da connection ou DML
+			//Utils.alertBox("layoutLeft", "Erro na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
 		}
-		catch(ClassNotFoundException ex){				// Apanha Erro da Class.forName()
-			Utils.alertBox("layoutLeft", "Erro no Driver");
+		catch(ClassNotFoundException ex){					// Apanha Erro da Class.forName()
+			//Utils.alertBox("layoutLeft", "Erro no Driver");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+			
 		}
 		catch(Exception ex){								// Apanha todas as restantes Exceções
-			Utils.alertBox("layoutLeft", "Erro genérico na ligação");
+		//	Utils.alertBox("layoutLeft", "Erro genérico na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro genérico na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
 			ex.printStackTrace();
 		}
 		finally{
@@ -204,9 +283,15 @@ public class UtilsSQLConn {
 						temp.setNIB(rs.getInt(5));
 						temp.setNISS(rs.getInt(6));
 						listaCliente.add(temp);
-						if(msgON){
-							Utils.alertBox("DB", "" + query +"\n CodCivil : " + temp.getCodCivil());
-						}
+						
+					}
+					if(msgON){
+						//Utils.alertBox("DB", "" + query +"\n CodCivil : " + temp.getCodCivil());
+						alertInfo.setTitle("SQL INFO");
+						alertInfo.setHeaderText("DB");
+						alertInfo.setContentText("Sucesso");
+
+						alertInfo.showAndWait();
 					}
 
 				}
@@ -215,7 +300,11 @@ public class UtilsSQLConn {
 				
 			}
 			catch(SQLException ex){							// Apanha Erro da connection ou DML
-				Utils.alertBox("Finally", "Erro na ligação");
+				alert.setTitle("SQL INFO");
+				alert.setHeaderText("Erro na ligação");
+				alert.setContentText("FINALLY");
+
+				alert.showAndWait();
 				shutdownConnection();
 			}				
 		}
@@ -233,17 +322,37 @@ public class UtilsSQLConn {
 			Class.forName(MYSQL_JDBC_DRIVER).newInstance();
 			conn = DriverManager.getConnection(MYSQL_DB_URL, MYSQL_DB_USER, MYSQL_DB_PASS );
 			if(msgON){
-				Utils.alertBox("layoutLeft", "Base dados aberta");
+				alertInfo.setTitle("SQL INFO");
+				alertInfo.setHeaderText("Base dados aberta");
+				alertInfo.setContentText("");
+
+				alertInfo.showAndWait();
 			}
 		}
-		catch(SQLException ex){							// Apanha Erro da connection ou DML
-			Utils.alertBox("layoutLeft", "Erro na ligação");
+		catch(SQLException ex){								// Apanha Erro da connection ou DML
+			//Utils.alertBox("layoutLeft", "Erro na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
 		}
-		catch(ClassNotFoundException ex){				// Apanha Erro da Class.forName()
-			Utils.alertBox("layoutLeft", "Erro no Driver");
+		catch(ClassNotFoundException ex){					// Apanha Erro da Class.forName()
+			//Utils.alertBox("layoutLeft", "Erro no Driver");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+			
 		}
 		catch(Exception ex){								// Apanha todas as restantes Exceções
-			Utils.alertBox("layoutLeft", "Erro genérico na ligação");
+		//	Utils.alertBox("layoutLeft", "Erro genérico na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro genérico na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
 			ex.printStackTrace();
 		}
 		finally{
@@ -257,7 +366,11 @@ public class UtilsSQLConn {
 				shutdownConnection();						// fecha a ligação
 			}
 			catch(SQLException ex){							// Apanha Erro da connection ou DML
-				Utils.alertBox("Finally", "Erro na ligação");
+				alert.setTitle("SQL INFO");
+				alert.setHeaderText("Erro na ligação");
+				alert.setContentText("FINALLY");
+
+				alert.showAndWait();
 				shutdownConnection();
 			}				
 		}
@@ -272,17 +385,34 @@ public class UtilsSQLConn {
 			Class.forName(MYSQL_JDBC_DRIVER).newInstance();
 			conn = DriverManager.getConnection(MYSQL_DB_URL, MYSQL_DB_USER, MYSQL_DB_PASS );
 			if(msgON){
-				Utils.alertBox("layoutLeft", "Base dados aberta");
+				alertInfo.setTitle("SQL INFO");
+				alertInfo.setHeaderText("Base dados aberta");
+				alertInfo.setContentText("");
+				alertInfo.showAndWait();
 			}
 		}
 		catch(SQLException ex){								// Apanha Erro da connection ou DML
-			Utils.alertBox("layoutLeft", "Erro na ligação");
+			//Utils.alertBox("layoutLeft", "Erro na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+			alert.showAndWait();
 		}
 		catch(ClassNotFoundException ex){					// Apanha Erro da Class.forName()
-			Utils.alertBox("layoutLeft", "Erro no Driver");
+			//Utils.alertBox("layoutLeft", "Erro no Driver");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+			
 		}
 		catch(Exception ex){								// Apanha todas as restantes Exceções
-			Utils.alertBox("layoutLeft", "Erro genérico na ligação");
+		//	Utils.alertBox("layoutLeft", "Erro genérico na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro genérico na ligação");
+			alert.setContentText("");
+			alert.showAndWait();
 			ex.printStackTrace();
 		}
 		finally{
@@ -293,98 +423,40 @@ public class UtilsSQLConn {
 					Statement stmt = conn.createStatement();		// Cria um obj comando sql
 					int dmlResult = stmt.executeUpdate(dml);		// Executa-o. Devolve o nº de registos tratados
 					if (dmlResult > 0 && msgON){					// Devolve inteiro > 0 se ok
-						Utils.alertBox("DB","Comando DML OK");		// 0 ou menor, se ERRO.
+						alertInfo.setTitle("SQL INFO");
+						alertInfo.setHeaderText("Comando Insert, Update ou Delete OK !");
+						alertInfo.setContentText("Sucesso");
+						alertInfo.showAndWait();
 					}
 					else{
 						if(msgON){
-							Utils.alertBox("DB","ERRO Comando DML");
+							alert.setTitle("SQL INFO");
+							alert.setHeaderText("Ocorreu um erro ao executar o comando DELETE !");
+							alert.setContentText("Verificar a conexão ao servidor ou o comando inserido");
+							
+							alert.showAndWait();
 						}
 					}
 				}		
 				shutdownConnection();
 			}
 			catch(SQLException ex){							// Apanha Erro da connection ou DML
-				Utils.alertBox("Finally", "Erro na ligação");
+				alert.setTitle("SQL INFO");
+				alert.setHeaderText("Erro na ligação");
+				alert.setContentText("FINALLY");
+
+				alert.showAndWait();
 				shutdownConnection();
 			}				
 		}
 	}
-	
-	/*************************************************************************************************
-	 * Métodos para carregamento das Listas de alimentação das TableViews. 
-	 * São executados pelo botão EDITAR, eliminar, alterar ou eliminar de cada entidade
-	 * Popular uma ObservableList com os dados da BD e desvolvemr à TableView
-	 *************************************************************************************************/
-    public static ObservableList<Aluno> carregaListaAlunos(){
-    	
-    	ObservableList<Aluno> listaAlunos = FXCollections.observableArrayList();
-
-    	/*TODO: Lista para preencher com os dados da tabela
-    	 * 	Executa uma query à tabela Aluno e para cada registo, 
-    	 * 		1 Extrai os 3 atributos: nProc, NAluno e nome
-    	 *  	2 Adiciona à lista
-    	 *  Devolve a lista à TableView para desenhar a lista de Alunos
-    	 */
-
-    	try{
-			//Tenta ligar-se ao SGBD e à base de dados
-			Class.forName(MYSQL_JDBC_DRIVER).newInstance();
-			conn = DriverManager.getConnection(MYSQL_DB_URL, MYSQL_DB_USER, MYSQL_DB_PASS );
-			if(msgON){
-				Utils.alertBox("carregaListaAlunos", "Base dados aberta");
-			}
-		}
-		catch(SQLException ex){							// Apanha Erro da connection ou DML
-			Utils.alertBox("carregaListaAlunos", "Erro na ligação");
-			return null;
-		}
-		catch(ClassNotFoundException ex){				// Apanha Erro da Class.forName()
-			Utils.alertBox("carregaListaAlunos", "Erro no Driver");
-			return null;
-		}
-		catch(Exception ex){								// Apanha todas as restantes Exceções
-			Utils.alertBox("carregaListaAlunos", "Erro genérico na ligação");
-			ex.printStackTrace();
-			return null;
-		}
-		finally{
-			try{
-				// Se ligação com sucesso, executa a query
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery("Select * from Aluno");
-				
-				// Para cada registo existente na Query rs,
-				while(rs.next()){					
-				//	Aluno a = new Aluno();			// Cria um novo aluno
-					//a.setNProc(rs.getInt(1));		// Copia o dado da coluna 1 (nProc) para a
-				//	a.setNTurma(rs.getInt(2));		// Extrai o dado da colina 2 (NAluno) para a
-				//	a.setNome(rs.getString(4));		// Extrai o dado da coluna 4 (Nome) para a
-				//	listaAlunos.add(a);				// Adiciona-o à lista.
-					
-					//Alternativa: uma unica linha, usando o contrutor de Aluno
-					//listaAlunos.add(new Aluno(rs.getInt(1), rs.getInt(2), rs.getString(4)));
-				}
-				if(msgON){
-					Utils.alertBox("carregaListaAlunos", "Lista Construida");
-				}
-				shutdownConnection();
-			}
-			catch(SQLException ex){							// Apanha Erro da connection ou DML
-				Utils.alertBox("carregaListaAlunos", "Finally - Erro na ligação");
-				shutdownConnection();
-				return null;
-			}	
-		}
-    	return listaAlunos;
-    }
-
 	
 	
 	/******************************************************************************************
 	 * SQLserver
 	 * */
 	
-
+/*
 	public static void connectToSQLSerrver(){
 		//Connection conn = null;
 		try{
@@ -421,20 +493,32 @@ public class UtilsSQLConn {
 	}
 	
 	
-	
+	*/
 	/*SHUTDOWNCONNECTION() - Fecha a ligação de BD*/
 	public static void shutdownConnection(){
 		try{
 			if (conn != null) { conn.close();}	// apenas se estiver aberta
 			if(msgON){
-				Utils.alertBox("SQLshutDown", "Base dados fechada");
+				//Utils.alertBox("SQLshutDown", "Base dados fechada");
+				alertInfo.setTitle("SQLshutDown");
+				alertInfo.setHeaderText("Base dados fechada");
+				alertInfo.setContentText("");
+				alertInfo.showAndWait();
 			}
 		}
 		catch(SQLException e){
-			Utils.alertBox("SQLshutDown", "Erro no fecho da ligação à BD");
+		//	Utils.alertBox("SQLshutDown", "Erro no fecho da ligação à BD");
+			alert.setTitle("SQLshutDown");
+			alert.setHeaderText("Erro no fecho da ligação à BD");
+			alert.setContentText("");
+			alert.showAndWait();
 		}
 		catch(Exception e){
-			Utils.alertBox("SQLshutDown", "Erro genérico no fecho da ligação à BD");
+		//	Utils.alertBox("SQLshutDown", "Erro genérico no fecho da ligação à BD");
+			alert.setTitle("SQLshutDown");
+			alert.setHeaderText("Erro genérico no fecho da ligação à BD");
+			alert.setContentText("");
+			alert.showAndWait();
 		}
     }
 	
