@@ -25,6 +25,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -38,17 +39,18 @@ import javafx.scene.text.Text;
 public class Main extends Application {
 	
 //Login
-	String userName = "";				//Define o utilizador 
-	String password = "";				//Define a password
+//	String userName = "";				//Define o utilizador 
+//	String password = "";				//Define a password
 	String checkUser, checkPw;				//2 Strings para verificar o login posteriormente
 	ObservableList<Faturacao> 	tabelaFaturas = FXCollections.observableArrayList();
 	ObservableList<Produto> 	tabelaProduto = FXCollections.observableArrayList();
 	ObservableList<Cliente> 	tabelaCliente = FXCollections.observableArrayList();
 	boolean msgOn = false;
 	//Outros
-	
+	//Objeto para receber o indice selecionado na tabela
 	static Faturacao faturaSelecionada = null;
 	static Produto produtoSelecionado = null;
+	static Cliente clienteSelecionado = null;
 	//----------------------ALERT DIALOG---------------------
 	Alert alert = new Alert(AlertType.ERROR);
 	Alert alertInfo = new Alert(AlertType.INFORMATION);
@@ -56,13 +58,21 @@ public class Main extends Application {
 	
 	//Todos os layouts do projeto
 	BorderPane layoutLogin = new BorderPane();
+	//Layout da Faturacao
+	BorderPane layoutFatura = new BorderPane();
 	GridPane layoutFormInserir = new GridPane();
 	GridPane layoutFormAlterar = new GridPane();
+	//Layouts do Produto
+	BorderPane layoutProduto = new BorderPane();
 	GridPane layoutFormInserirProduto = new GridPane();
 	GridPane layoutFormAlterarProduto = new GridPane();
-	BorderPane layoutProduto = new BorderPane();
+	//Layouts do Cliente
 	BorderPane layoutCliente = new BorderPane();
-	BorderPane layoutFatura = new BorderPane();
+	GridPane layoutFormInserirCliente = new GridPane();
+	GridPane layoutFormAlterarCliente = new GridPane();
+	
+	
+	
 	BorderPane layoutRoot = new BorderPane();
 	
 	//Tabelas
@@ -277,9 +287,21 @@ public class Main extends Application {
 		        
 				//layoutCliente.getChildren().add(tableCliente);
 				
+				
+				HBox hBoxCliente = new HBox(10);
+				hBoxCliente.setPadding(new Insets(10,0,10,250));
+				hBoxCliente.setStyle("-fx-background-color: #005CB8");
+		        
+		        //Os 3 Butões , inserir ,alterar e eliminar
+		        Button btnInserirCliente = new Button("Inserir");
+		        //btnInserirFatura.setPadding(value);
+		        Button btnAlterarCliente = new Button("Alterar");
+		        Button btnEliminarCliente = new Button("Eliminar");
+		       
+		        //Adiciona os butoes a HBOX e Hbox ao Buttom do Border Pane
+		        hBoxCliente.getChildren().addAll(btnInserirCliente,btnAlterarCliente,btnEliminarCliente);
 				layoutCliente.setCenter(tableCliente);
-			
-			
+				layoutCliente.setBottom(hBoxCliente);
 			
 			
 			//Layout root e outros layouts ----
@@ -291,12 +313,53 @@ public class Main extends Application {
 	        Button btnQuit = new Button("Sair");
 	        
 	        layoutCenter.getChildren().addAll(btnEntrar, btnQuit);*/
-	        //-------------------------------------login-----------------------------------------
-			Button btnOk = new Button("OK");
+//-------------------------------------------------------------LOGIN----------------------------------------------------------
+					Text loginText = new Text();
+					loginText.setText("Log-In");
+					loginText.setFont(Font.font("Tahoma", FontWeight.MEDIUM, 20));
+					BorderPane layoutLogin = new BorderPane();
+			        GridPane gridLogin = new GridPane();
+			        layoutLogin.setCenter(gridLogin);
+			        gridLogin.setAlignment(Pos.CENTER);
+			        gridLogin.setHgap(10);
+			        gridLogin.setVgap(10);
+			        gridLogin.setPadding(new Insets(25, 25, 25, 25));
 
-	        //Layout GRID
+			        gridLogin.add(loginText, 0, 0, 2, 1);
+
+			        Label username = new Label();
+			        username.setText("Username");
+			        gridLogin.add(username, 0, 1);
+
+			        TextField textFieldUserName = new TextField();
+			        gridLogin.add(textFieldUserName, 1, 1);
+
+			        Label password = new Label();
+			        password.setText("Password");
+			        gridLogin.add(password, 0, 2);
+
+			        PasswordField passwordFieldPassword = new PasswordField();
+			        gridLogin.add(passwordFieldPassword, 1, 2);
+
+			        
+			        Button btnOk = new Button("Sign In"); 
+			        btnOk.setDefaultButton(true);
+			        HBox hbox = new HBox(8); // spacing = 8
+			        hbox.getChildren().add(btnOk);
+			        hbox.setAlignment(Pos.BOTTOM_RIGHT);
+			        gridLogin.add(hbox, 1, 3);
+			        //gridLogin.setGridLinesVisible(true); //Uncomment to see the actual layout
+			        final Text pressedText = new Text();
+			        pressedText.setFill(Color.FIREBRICK);
+			        gridLogin.add(pressedText, 1, 5);
+			        
+			        HBox hBoxRegistar = new HBox();
+			        Button registar = new Button("Regista-te Aqui!");
+			        hBoxRegistar.getChildren().addAll(registar);
+			        layoutLogin.setBottom(hBoxRegistar);
+	        //Layout gridLogin
 			
-			
+/*			
 			HBox hbLoginText = new HBox(50);
 			hbLoginText.setPadding(new Insets(0,0,0,100));
 		//	hbLoginText.setStyle("");
@@ -325,7 +388,7 @@ public class Main extends Application {
 			layoutCenter.add(passwordFieldPassword, 2,3);
 			layoutCenter.add(btnOk, 2, 4);
 			
-			btnOk.setDefaultButton(true);
+			btnOk.setDefaultButton(true);*/
 			
 			//--------------------------------------------------SCENE E LAYOUT -------------------------------------------
 	        //Border Pane
@@ -334,13 +397,14 @@ public class Main extends Application {
 			//layoutRoot.setBottom(btnInserir);
 			//Scene ( Janela) Principal------
 			Scene principal = new Scene(layoutRoot,700,500);
-			Scene login = new Scene(layoutLogin,330,180);
+			Scene login = new Scene(layoutLogin,300,250);
 		//	Scene fatura = new Scene(layoutFatura, 400,400);
 			
 			
 			//-------------------MENUS and BUTTONS EVENT HANDLERS ----------------------
 			menuFaturaMostrar.setOnAction(e->{
 	        	layoutRoot.setCenter(layoutFatura);
+	        	primaryStage.setTitle("Faturação");
 	        	try {
 	        		tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
 				
@@ -355,6 +419,7 @@ public class Main extends Application {
 	        });
 			menuProdutoMostrar.setOnAction(e->{
 	        	layoutRoot.setCenter(layoutProduto);
+	        	primaryStage.setTitle("Produtos");
 	        	try {
 	        		tabelaProduto.setAll(UtilsSQLConn.mySqlQweryProduto("SELECT * FROM `produto`"));
 				} catch (NullPointerException e2) {
@@ -369,6 +434,7 @@ public class Main extends Application {
 			
 			menuClienteMostrar.setOnAction(e->{
 	        layoutRoot.setCenter(layoutCliente);
+	        primaryStage.setTitle("Clientes");
 	        try {
 	        	tabelaCliente.setAll(UtilsSQLConn.mySqlQweryCliente("SELECT * FROM `cliente`"));
 			} catch (NullPointerException e2) {
@@ -461,10 +527,51 @@ public class Main extends Application {
 				}
 				tabelaProduto.setAll(UtilsSQLConn.mySqlQweryProduto("SELECT * FROM `produto`"));
 			});
+//--------------------------------------------Inserir, Alterar e Eliminar Clientes-------------------------------------------------	
+			//Método para chamar o layout de Inserir Clientes
+			btnInserirCliente.setOnAction(e->{
+				layoutRoot.setCenter(FormInserirClientes());
+			});
+			
+			//Método para chamar o layout de Alterar Clientes
+			btnAlterarCliente.setOnAction(e->{
+				try {
+					layoutRoot.setCenter(FormAlterarClientes());
+				}	
+				catch (NullPointerException e2) {
+					alert.setTitle("Exception ");
+					alert.setHeaderText("Não selecionou nenhum dado da tabela");
+					alert.setContentText("");
+					alert.showAndWait();
+				}
+				
+				
+			});
+			
+			//Metodo para Eliminar Clientes da Tabela
+			btnEliminarCliente.setOnAction(e->{
+				int codCivil;
+				
+				ObservableList<Cliente> itemSelecionado = tableCliente.getSelectionModel().getSelectedItems();
+				clienteSelecionado = itemSelecionado.get(0);
+				
+				try {
+					
+					codCivil = clienteSelecionado.getCodCivil();
+					UtilsSQLConn.mySqlDml("Delete from cliente where codCivil = "+codCivil+" ");
+					
+				} catch (NullPointerException e2) {
+					alert.setTitle("Exception ");
+					alert.setHeaderText("Não selecionou nenhum dado da tabela");
+					alert.setContentText("");
+					alert.showAndWait();
+				}
+				tabelaCliente.setAll(UtilsSQLConn.mySqlQweryCliente("SELECT * FROM `cliente`"));
+			});
 //---------------------------------------------------------------------------------------------------------------
 			//Método do botão OK - LOGIN
 			btnOk.setOnAction(e->{
-				
+				pressedText.setText("Entrando...");
 				//Necessário para receber o que está dentro das text field e passwordfield
 				checkUser = textFieldUserName.getText().toString();
 				checkPw = passwordFieldPassword.getText().toString();
@@ -473,10 +580,7 @@ public class Main extends Application {
 				//Compara (if) se a string checkUser equals(é igual) ao username e o mesmo para a password
 				//Se sim entra , muda de stage
 				
-				if(checkUser.equals(userName)  && checkPw.equals(password)){
-					
-					alertInfo.setTitle("Deu");
-					alertInfo.showAndWait();
+				if(UtilsSQLConn.mySqlQueryVerificarLogin(checkUser, checkPw)){
 					primaryStage.setMinHeight(500);
 					primaryStage.setMinWidth(700);
 					primaryStage.setMaxHeight(564213);
@@ -491,8 +595,9 @@ public class Main extends Application {
 					alert.showAndWait();
 				}
 				try {
-					layoutRoot.setCenter(layoutFatura);
+					
 					tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
+					layoutRoot.setCenter(layoutFatura);
 				} catch (NullPointerException e2) {
 					alert.setTitle("Exception ");
 					alert.setHeaderText("Erro de ligação à BD ");
@@ -501,10 +606,10 @@ public class Main extends Application {
 				}
 				
 			});
-			primaryStage.setMinHeight(180);
+	/*		primaryStage.setMinHeight(180);
 			primaryStage.setMinWidth(330);
 			primaryStage.setMaxHeight(180);
-			primaryStage.setMaxWidth(330);
+			primaryStage.setMaxWidth(330);*/
 			primaryStage.setScene(login);
 			primaryStage.setTitle("Faturação");
 			primaryStage.show();
@@ -515,7 +620,7 @@ public class Main extends Application {
 	/*********************************************************************************************************************
 	 * Esta função é apresentada ao criar uma nova Insersão para a tabela
 	 * Apresenta os dados e  campos necessários e faz a conexão com a base de dados para inserir os dados
-	 * @return um Layout Grid Pane
+	 * @return um Layout gridLogin Pane
 	 */
 	private GridPane FormFaturacaoInserir() {
 		
@@ -862,102 +967,351 @@ public class Main extends Application {
 	
 	private GridPane FormAlterarProduto() {
 		//Label do topo informativa
-				Label lbTopo = new Label("Informações do Produto");
-				lbTopo.setFont(Font.font("Arial",FontWeight.BOLD, 12));
-				
-				//Label Nome do Produto + TextField
-				Label lbNomeProduto = new Label("Nome Produto");
-				TextField txtNomeProduto = new TextField();
-				txtNomeProduto.setPromptText("Nome do Produto");
-				
-				//Label Marca + Text Field
-				Label lbMarca = new Label("Marca");
-				TextField txtMarca = new TextField();
-				txtMarca.setPromptText("Marca do Produto");
-				//Label Data de Validade + Text Field
-				Label lbDataValidade = new Label("Data de Validade");
-				TextField txtDataDeValidade = new TextField();
-				txtDataDeValidade.setPromptText("Data de Validade");
-				
-				//Label Preço + TextField
-				Label lbPreco = new Label("Preço");
-				TextField txtPreco = new TextField();
-				txtPreco.setPromptText("Preço do Produto");
-				
-				
-				//Label Stock + TextField
-				Label lbStock = new Label("Stock");
-				TextField txtStock = new TextField();
-				txtStock.setPromptText("Quantidade em Stock");
-				
-				//Botões OK e Cancelar
-				Button btnOkFormProduto = new Button("OK");
-				Button btnCancelFormProduto = new Button("Cancelar");
-				btnCancelFormProduto.setCancelButton(true);
-				btnCancelFormProduto.setCancelButton(true);
-				
-				//Layout horizontal para alinhar os 2 botoes
-				HBox layoutOkCancelProduto = new HBox(55);
-				layoutOkCancelProduto.getChildren().addAll(btnOkFormProduto, btnCancelFormProduto);
-				
-				layoutFormAlterarProduto.setAlignment(Pos.TOP_LEFT);
-				layoutFormAlterarProduto.setHgap(10);
-				layoutFormAlterarProduto.setVgap(10);
-				layoutFormAlterarProduto.setPadding(new Insets(10, 20, 20, 20));
-				
-				layoutFormAlterarProduto.add(lbTopo, 1, 1);
-				layoutFormAlterarProduto.add(lbNomeProduto, 1, 2);
-				layoutFormAlterarProduto.add(lbMarca,1,3);
-				layoutFormAlterarProduto.add(lbDataValidade,1,4);
-				layoutFormAlterarProduto.add(lbPreco,1,5);
-				layoutFormAlterarProduto.add(lbStock,1,6);
-				
-				layoutFormAlterarProduto.add(txtNomeProduto, 2, 2);
-				layoutFormAlterarProduto.add(txtMarca, 2,3);
-				layoutFormAlterarProduto.add(txtDataDeValidade,2,4);
-				layoutFormAlterarProduto.add(txtPreco,2,5);
-				layoutFormAlterarProduto.add(txtStock,2,6);
-				layoutFormAlterarProduto.add(layoutOkCancelProduto, 2, 7);
-				
+		Label lbTopo = new Label("Informações do Produto");
+		lbTopo.setFont(Font.font("Arial",FontWeight.BOLD, 12));
+		
+		//Label Nome do Produto + TextField
+		Label lbNomeProduto = new Label("Nome Produto");
+		TextField txtNomeProduto = new TextField();
+		txtNomeProduto.setPromptText("Nome do Produto");
+		
+		//Label Marca + Text Field
+		Label lbMarca = new Label("Marca");
+		TextField txtMarca = new TextField();
+		txtMarca.setPromptText("Marca do Produto");
+		//Label Data de Validade + Text Field
+		Label lbDataValidade = new Label("Data de Validade");
+		TextField txtDataDeValidade = new TextField();
+		txtDataDeValidade.setPromptText("Data de Validade");
+		
+		//Label Preço + TextField
+		Label lbPreco = new Label("Preço");
+		TextField txtPreco = new TextField();
+		txtPreco.setPromptText("Preço do Produto");
+		
+		
+		//Label Stock + TextField
+		Label lbStock = new Label("Stock");
+		TextField txtStock = new TextField();
+		txtStock.setPromptText("Quantidade em Stock");
+		
+		//Botões OK e Cancelar
+		Button btnOkFormProduto = new Button("OK");
+		Button btnCancelFormProduto = new Button("Cancelar");
+		btnCancelFormProduto.setCancelButton(true);
+		btnCancelFormProduto.setCancelButton(true);
+		
+		//Layout horizontal para alinhar os 2 botoes
+		HBox layoutOkCancelProduto = new HBox(55);
+		layoutOkCancelProduto.getChildren().addAll(btnOkFormProduto, btnCancelFormProduto);
+		
+		layoutFormAlterarProduto.setAlignment(Pos.TOP_LEFT);
+		layoutFormAlterarProduto.setHgap(10);
+		layoutFormAlterarProduto.setVgap(10);
+		layoutFormAlterarProduto.setPadding(new Insets(10, 20, 20, 20));
+		
+		layoutFormAlterarProduto.add(lbTopo, 1, 1);
+		layoutFormAlterarProduto.add(lbNomeProduto, 1, 2);
+		layoutFormAlterarProduto.add(lbMarca,1,3);
+		layoutFormAlterarProduto.add(lbDataValidade,1,4);
+		layoutFormAlterarProduto.add(lbPreco,1,5);
+		layoutFormAlterarProduto.add(lbStock,1,6);
+		
+		layoutFormAlterarProduto.add(txtNomeProduto, 2, 2);
+		layoutFormAlterarProduto.add(txtMarca, 2,3);
+		layoutFormAlterarProduto.add(txtDataDeValidade,2,4);
+		layoutFormAlterarProduto.add(txtPreco,2,5);
+		layoutFormAlterarProduto.add(txtStock,2,6);
+		layoutFormAlterarProduto.add(layoutOkCancelProduto, 2, 7);
+		
 
-				ObservableList<Produto> itemSelecionado = tableProdutos.getSelectionModel().getSelectedItems();
-				
-				produtoSelecionado = itemSelecionado.get(0);
-				
-				txtNomeProduto.setText(produtoSelecionado.getNomeProduto());
-				txtMarca.setText(produtoSelecionado.getMarca());
-				txtDataDeValidade.setText(produtoSelecionado.getDataValidade());
-				txtPreco.setText(produtoSelecionado.getPreco());
-				txtStock.setText(produtoSelecionado.getStock());
-				
-				btnOkFormProduto.setOnAction(e->{
-					int codProduto;
-					String nomeProduto;
-					String marca;
-					String dataValidade;
-					String preco;
-					String stock;
-					
-					codProduto = produtoSelecionado.getCodProduto();
-					nomeProduto = txtNomeProduto.getText();
-					marca = txtMarca.getText();
-					dataValidade = txtDataDeValidade.getText();
-					preco = txtPreco.getText();
-					stock = txtStock.getText();
-					
-					
-					UtilsSQLConn.mySqlDml("UPDATE `produto` SET `codProduto`= "+codProduto+",`NomeProduto`= '" +nomeProduto+ "',`Marca`= '"+marca+"',`DataValidade`= '"+dataValidade+"' ,`Preco`= '"+preco+"' ,`Stock`= '"+stock+"' WHERE codProduto = " +codProduto);
-					layoutRoot.setCenter(layoutProduto);
-		        	tabelaProduto.setAll(UtilsSQLConn.mySqlQweryProduto("SELECT * FROM `produto`"));
-				});
-				
-				btnCancelFormProduto.setOnAction(e->{
-					layoutRoot.setCenter(layoutProduto);
-				});
+		ObservableList<Produto> itemSelecionado = tableProdutos.getSelectionModel().getSelectedItems();
+		
+		produtoSelecionado = itemSelecionado.get(0);
+		
+		txtNomeProduto.setText(produtoSelecionado.getNomeProduto());
+		txtMarca.setText(produtoSelecionado.getMarca());
+		txtDataDeValidade.setText(produtoSelecionado.getDataValidade());
+		txtPreco.setText(produtoSelecionado.getPreco());
+		txtStock.setText(produtoSelecionado.getStock());
+		
+		btnOkFormProduto.setOnAction(e->{
+			int codProduto;
+			String nomeProduto;
+			String marca;
+			String dataValidade;
+			String preco;
+			String stock;
+			
+			codProduto = produtoSelecionado.getCodProduto();
+			nomeProduto = txtNomeProduto.getText();
+			marca = txtMarca.getText();
+			dataValidade = txtDataDeValidade.getText();
+			preco = txtPreco.getText();
+			stock = txtStock.getText();
+			
+			
+			UtilsSQLConn.mySqlDml("UPDATE `produto` SET `codProduto`= "+codProduto+",`NomeProduto`= '" +nomeProduto+ "',`Marca`= '"+marca+"',`DataValidade`= '"+dataValidade+"' ,`Preco`= '"+preco+"' ,`Stock`= '"+stock+"' WHERE codProduto = " +codProduto);
+			layoutRoot.setCenter(layoutProduto);
+        	tabelaProduto.setAll(UtilsSQLConn.mySqlQweryProduto("SELECT * FROM `produto`"));
+        	produtoSelecionado = null;
+		});
+		
+		btnCancelFormProduto.setOnAction(e->{
+			layoutRoot.setCenter(layoutProduto);
+		});
 		return layoutFormAlterarProduto;
 		
 	}
 	
+	/**********************************************************************
+	 * Método que faz  o Insert na tabela Clientes
+	 * O metodo retorna um Layout grid com um formulário 
+	 * O formulário tem  as Labels e Text Field e 2 botões, aceitar e Cancelar
+	 * Ok - Fará o acesso à bd com o Comando INSERT
+	 * Cancelar - Voltar ao Layout principal com a tabela dos Clientes
+	 * @return
+	 */
+	private GridPane FormInserirClientes() {
+		
+		//Label do topo informativa
+		Label lbTopo = new Label("Informações do Cliente");
+		lbTopo.setFont(Font.font("Arial",FontWeight.BOLD, 12));
+		
+		//Label Nome + TextField
+		Label lbNome = new Label("Nome");
+		TextField txtNome = new TextField();
+		txtNome.setPromptText("Nome do Cliente");
+		
+		//Label NIF + Text Field
+		Label lbNIF = new Label("NIF");
+		TextField txtNIF = new TextField();
+		txtNIF.setPromptText("Número de Indentificação Físcal");
+		//Label Morada + Text Field
+		Label lbMorada = new Label("Morada");
+		TextField txtMorada = new TextField();
+		txtMorada.setPromptText("Ex: Rua das Flores nº3 4ºEsq");
+		
+		//Label Preço + TextField
+		Label lbNIB = new Label("NIB");
+		TextField txtNIB = new TextField();
+		txtNIB.setPromptText("Número de Indentificação Bancário");
+		
+		
+		//Label Stock + TextField
+		Label lbNISS = new Label("NISS");
+		TextField txtNISS = new TextField();
+		txtNISS.setPromptText("Número de Identificação de Segurança Social");
+		
+		//Botões OK e Cancelar
+		Button btnOkFormCliente = new Button("OK");
+		Button btnCancelFormCliente = new Button("Cancelar");
+		btnCancelFormCliente.setCancelButton(true);
+		HBox layoutOkCancelCliente = new HBox(55);
+		layoutOkCancelCliente.getChildren().addAll(btnOkFormCliente, btnCancelFormCliente);
+		//Tratamento e Adição ao layout
+		layoutFormInserirCliente.setAlignment(Pos.TOP_LEFT);
+		layoutFormInserirCliente.setHgap(10);
+		layoutFormInserirCliente.setVgap(10);
+		layoutFormInserirCliente.setPadding(new Insets(10, 20, 20, 20));
+		
+		//Labels
+		layoutFormInserirCliente.add(lbTopo, 1, 1);
+		layoutFormInserirCliente.add(lbNome, 1, 2);
+		layoutFormInserirCliente.add(lbNIF, 1, 3);
+		layoutFormInserirCliente.add(lbMorada, 1, 4);
+		layoutFormInserirCliente.add(lbNIB, 1, 5);
+		layoutFormInserirCliente.add(lbNISS, 1, 6);
+		//TextFields
+		layoutFormInserirCliente.add(txtNome, 2, 2);
+		layoutFormInserirCliente.add(txtNIF, 2, 3);
+		layoutFormInserirCliente.add(txtMorada, 2, 4);
+		layoutFormInserirCliente.add(txtNIB, 2, 5);
+		layoutFormInserirCliente.add(txtNISS, 2, 6);
+		
+		//HBOX
+		layoutFormInserirCliente.add(layoutOkCancelCliente, 2, 7);
+		
+		//Metodo que faz a insersão na BD
+		btnOkFormCliente.setOnAction(e->{
+			//Protege os campos para serem preenchidos
+			if(txtNome.getText().isEmpty() || txtNIF.getText().isEmpty() || txtMorada.getText().isEmpty() || txtNIB.getText().isEmpty() || txtNISS.getText().isEmpty())
+			{
+				alert.setTitle("Erro ao criar!");
+				alert.setHeaderText("Preencha os Campos!");
+				alert.showAndWait();
+			}
+			
+			//Variaveis para receberem o que está dentro das TextFields da Form
+			String nome;
+			int nif;
+			String morada;
+			int nib;
+			int niss;
+			
+			//Recebe os dados das text fields
+			nome = txtNome.getText();
+			morada = txtMorada.getText();
+			/*Try com 2 Catch 
+				O Primeiro trata se o numero de uma textfield for muito grande ou 
+				se tentou converter uma string que está vazia para um numero
+				O Segundo apanha caso houver um erro de ligação
+			*/ 
+			try {
+				nif = Integer.parseInt(txtNIF.getText());
+				nib = Integer.parseInt(txtNIB.getText());
+				niss = Integer.parseInt(txtNISS.getText());
+				UtilsSQLConn.mySqlDml("INSERT INTO `cliente`(`codCivil`, `Nome`, `NIF`, `Morada`, `NIB`, `NISS`) VALUES (Null,'"+nome+"',"+nif+",'"+morada+"',"+nib+","+niss+")");
+			} catch (NumberFormatException e2) {
+				alert.setTitle("Exeption! ");
+				alert.setHeaderText("Tentou converter para um numero um string vazia ou demasiado grande");
+				alert.showAndWait();
+				
+			}
+			 catch (NullPointerException e2) {
+				alert.setTitle("Exception ");
+				alert.setHeaderText("Erro de Ligação à BD");
+				alert.setContentText("Ponteiro Nulo");
+				alert.showAndWait();
+			}
+			
+			//Apanha caso houver um ponteiro nulo
+			try {
+				tabelaCliente.setAll(UtilsSQLConn.mySqlQweryCliente("SELECT * FROM `cliente`"));
+				layoutRoot.setCenter(layoutCliente);
+			} catch (NullPointerException e2) {
+				alert.setTitle("Exception ");
+				alert.setHeaderText("Erro de Ligação à BD");
+				alert.setContentText("Ponteiro Nulo");
+				alert.showAndWait();
+			}
+			
+			
+			
+			
+		});
+		btnCancelFormCliente.setOnAction(e->{
+			layoutRoot.setCenter(layoutCliente);
+		});
+		return layoutFormInserirCliente;
+		
+		
+	}
 	
+	private GridPane FormAlterarClientes() {
+
+		//Label do topo informativa
+		Label lbTopo = new Label("Informações do Cliente");
+		lbTopo.setFont(Font.font("Arial",FontWeight.BOLD, 12));
+		
+		//Label Nome + TextField
+		Label lbNome = new Label("Nome");
+		TextField txtNome = new TextField();
+		txtNome.setPromptText("Nome do Cliente");
+		
+		//Label NIF + Text Field
+		Label lbNIF = new Label("NIF");
+		TextField txtNIF = new TextField();
+		txtNIF.setPromptText("Número de Indentificação Físcal");
+		//Label Morada + Text Field
+		Label lbMorada = new Label("Morada");
+		TextField txtMorada = new TextField();
+		txtMorada.setPromptText("Ex: Rua das Flores nº3 4ºEsq");
+		
+		//Label Preço + TextField
+		Label lbNIB = new Label("NIB");
+		TextField txtNIB = new TextField();
+		txtNIB.setPromptText("Número de Indentificação Bancário");
+		
+		
+		//Label Stock + TextField
+		Label lbNISS = new Label("NISS");
+		TextField txtNISS = new TextField();
+		txtNISS.setPromptText("Número de Identificação de Segurança Social");
+		
+		//Botões OK e Cancelar
+		Button btnOkFormCliente = new Button("OK");
+		Button btnCancelFormCliente = new Button("Cancelar");
+		btnCancelFormCliente.setCancelButton(true);
+		HBox layoutOkCancelCliente = new HBox(55);
+		layoutOkCancelCliente.getChildren().addAll(btnOkFormCliente, btnCancelFormCliente);
+		//Tratamento e Adição ao layout
+		layoutFormAlterarCliente.setAlignment(Pos.TOP_LEFT);
+		layoutFormAlterarCliente.setHgap(10);
+		layoutFormAlterarCliente.setVgap(10);
+		layoutFormAlterarCliente.setPadding(new Insets(10, 20, 20, 20));
+		
+		//Labels
+		layoutFormAlterarCliente.add(lbTopo, 1, 1);
+		layoutFormAlterarCliente.add(lbNome, 1, 2);
+		layoutFormAlterarCliente.add(lbNIF, 1, 3);
+		layoutFormAlterarCliente.add(lbMorada, 1, 4);
+		layoutFormAlterarCliente.add(lbNIB, 1, 5);
+		layoutFormAlterarCliente.add(lbNISS, 1, 6);
+		//TextFields
+		layoutFormAlterarCliente.add(txtNome, 2, 2);
+		layoutFormAlterarCliente.add(txtNIF, 2, 3);
+		layoutFormAlterarCliente.add(txtMorada, 2, 4);
+		layoutFormAlterarCliente.add(txtNIB, 2, 5);
+		layoutFormAlterarCliente.add(txtNISS, 2, 6);
+		
+		//HBOX
+		layoutFormAlterarCliente.add(layoutOkCancelCliente, 2, 7);
+		
+		ObservableList<Cliente> itemSelecionado = tableCliente.getSelectionModel().getSelectedItems();
+		
+		clienteSelecionado = itemSelecionado.get(0);
+		
+		
+		//Variaveis que recebem os dados do indice selecionado
+		
+		txtNome.setText(clienteSelecionado.getNome());
+		txtNIF.setText(String.valueOf(clienteSelecionado.getNIF()));
+		txtMorada.setText(clienteSelecionado.getMorada());
+		txtNIB.setText(String.valueOf(clienteSelecionado.getNIB()));
+		txtNISS.setText(String.valueOf(clienteSelecionado.getNISS()));
+				
+		btnOkFormCliente.setOnAction(e->{
+			int codCivil;
+			String nome;
+			int nif;
+			String morada;
+			int nib;
+			int niss;
+			
+			codCivil = clienteSelecionado.getCodCivil();
+			nome = txtNome.getText();
+			morada = txtMorada.getText();
+			try {
+				nif = Integer.parseInt(txtNIF.getText());
+				nib = Integer.parseInt(txtNIB.getText());
+				niss = Integer.parseInt(txtNISS.getText());
+				UtilsSQLConn.mySqlDml("UPDATE `cliente` SET `codCivil`= "+codCivil+",`Nome`= '" +nome+ "',`NIF`= "+nif+",`Morada`= '"+morada+"' ,`NIB`= "+nib+" ,`NISS`= "+niss+" WHERE codCivil = " +codCivil);
+			} catch (NumberFormatException e2) {
+				alert.setTitle("Exeption! ");
+				alert.setHeaderText("Tentou converter para um numero um string vazia ou demasiado grande");
+				alert.showAndWait();
+				
+			}
+			 catch (NullPointerException e2) {
+				alert.setTitle("Exception ");
+				alert.setHeaderText("Erro de Ligação à BD");
+				alert.setContentText("Ponteiro Nulo");
+				alert.showAndWait();
+			}
+			//Apanha caso houver um ponteiro nulo
+			try {
+				tabelaCliente.setAll(UtilsSQLConn.mySqlQweryCliente("SELECT * FROM `cliente`"));
+				layoutRoot.setCenter(layoutCliente);
+			} catch (NullPointerException e2) {
+				alert.setTitle("Exception ");
+				alert.setHeaderText("Erro de Ligação à BD");
+				alert.setContentText("Ponteiro Nulo");
+				alert.showAndWait();
+			}
+		});
+		return layoutFormAlterarCliente;
+		
+	}
 	
 }

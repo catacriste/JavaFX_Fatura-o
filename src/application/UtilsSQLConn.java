@@ -66,6 +66,66 @@ public class UtilsSQLConn {
 	}*/
 	//SELECT * FROM `fatura` WHERE 1
 	// Executa uma query à base de dados de um SGBD MySQL
+	public static boolean mySqlQueryVerificarLogin(String user, String password){
+		String query = "SELECT * FROM `utilizadores`";
+		boolean verificar = false;
+		
+		
+		try{
+			//Tenta ligar-se ao SGBD e à base de dados
+			Class.forName(MYSQL_JDBC_DRIVER).newInstance();
+			conn = DriverManager.getConnection(MYSQL_DB_URL, MYSQL_DB_USER, MYSQL_DB_PASS );
+			if(msgON){
+				alertInfo.setTitle("SQL INFO");
+				alertInfo.setHeaderText("Base dados aberta");
+				alertInfo.setContentText("");
+
+				alertInfo.showAndWait();
+			}
+		}
+		catch(SQLException ex){								// Apanha Erro da connection ou DML
+			//Utils.alertBox("layoutLeft", "Erro na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+		}
+		catch(ClassNotFoundException ex){					// Apanha Erro da Class.forName()
+			//Utils.alertBox("layoutLeft", "Erro no Driver");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+			
+		}
+		catch(Exception ex){								// Apanha todas as restantes Exceções
+		//	Utils.alertBox("layoutLeft", "Erro genérico na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro genérico na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+			ex.printStackTrace();
+		}
+		finally{
+			try {
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(query);
+				while(rs.next()){
+					if(user.equals(rs.getString(1)) && password.equals(rs.getString(2))) {
+						verificar = true;
+					}
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return verificar;
+	}
+	
 	public static ObservableList<Faturacao> mySqlQweryFaturacao(String query){
 		ObservableList<Faturacao> listaFatura = FXCollections.observableArrayList();
 		try{
