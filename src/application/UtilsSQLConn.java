@@ -13,6 +13,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.security.auth.login.LoginContext;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
@@ -66,6 +68,68 @@ public class UtilsSQLConn {
 	}*/
 	//SELECT * FROM `fatura` WHERE 1
 	// Executa uma query à base de dados de um SGBD MySQL
+	public static boolean mySqlQueryRegistarLogin(String user, String password, String email){
+		String queryInsert = "INSERT INTO `utilizadores`(`codUtilizador`,`user`, `password`, `email`) VALUES (Null,'"+user+"','"+password+"','"+email+"')";
+		String querySelect = "SELECT * FROM `utilizadores`";
+		boolean verificar = true;
+		try{
+			//Tenta ligar-se ao SGBD e à base de dados
+			Class.forName(MYSQL_JDBC_DRIVER).newInstance();
+			conn = DriverManager.getConnection(MYSQL_DB_URL, MYSQL_DB_USER, MYSQL_DB_PASS );
+			if(msgON){
+				alertInfo.setTitle("SQL INFO");
+				alertInfo.setHeaderText("Base dados aberta");
+				alertInfo.setContentText("");
+
+				alertInfo.showAndWait();
+			}
+		}
+		catch(SQLException ex){								// Apanha Erro da connection ou DML
+			//Utils.alertBox("layoutLeft", "Erro na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+		}
+		catch(ClassNotFoundException ex){					// Apanha Erro da Class.forName()
+			//Utils.alertBox("layoutLeft", "Erro no Driver");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+			
+		}
+		catch(Exception ex){								// Apanha todas as restantes Exceções
+		//	Utils.alertBox("layoutLeft", "Erro genérico na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro genérico na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+			ex.printStackTrace();
+		}
+		finally{
+			try {
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(querySelect);
+				while(rs.next()){
+					if(user.equals(rs.getString(1)) || email.equals(rs.getString(3))) {
+						verificar = false;
+					}
+				}
+				if(verificar)
+				{
+					stmt.executeUpdate(queryInsert);
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return verificar;
+	}
 	public static boolean mySqlQueryVerificarLogin(String user, String password){
 		String query = "SELECT * FROM `utilizadores`";
 		boolean verificar = false;
@@ -114,7 +178,7 @@ public class UtilsSQLConn {
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery(query);
 				while(rs.next()){
-					if(user.equals(rs.getString(1)) && password.equals(rs.getString(2))) {
+					if(user.equals(rs.getString(1)) && password.equals(rs.getString(3))) {
 						verificar = true;
 					}
 				}

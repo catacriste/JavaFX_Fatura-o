@@ -57,7 +57,9 @@ public class Main extends Application {
 	
 	
 	//Todos os layouts do projeto
+	GridPane gridLogin = new GridPane();
 	BorderPane layoutLogin = new BorderPane();
+	GridPane layoutRegistar = new GridPane();
 	//Layout da Faturacao
 	BorderPane layoutFatura = new BorderPane();
 	GridPane layoutFormInserir = new GridPane();
@@ -317,8 +319,8 @@ public class Main extends Application {
 					Text loginText = new Text();
 					loginText.setText("Log-In");
 					loginText.setFont(Font.font("Tahoma", FontWeight.MEDIUM, 20));
-					BorderPane layoutLogin = new BorderPane();
-			        GridPane gridLogin = new GridPane();
+				//	BorderPane layoutLogin = new BorderPane();
+			        
 			        layoutLogin.setCenter(gridLogin);
 			        gridLogin.setAlignment(Pos.CENTER);
 			        gridLogin.setHgap(10);
@@ -354,9 +356,14 @@ public class Main extends Application {
 			        gridLogin.add(pressedText, 1, 5);
 			        
 			        HBox hBoxRegistar = new HBox();
-			        Button registar = new Button("Regista-te Aqui!");
+			        hBoxRegistar.setPadding(new Insets(0,0,90,95));
+			        Button registar = new Button("Registar");
 			        hBoxRegistar.getChildren().addAll(registar);
-			        layoutLogin.setBottom(hBoxRegistar);
+			        gridLogin.add(hBoxRegistar, 1,6);
+			      //  layoutLogin.setBottom(hBoxRegistar);
+			        
+			        //hBoxRegistar.setAlignment(Pos.TOP_CENTER);
+			       
 	        //Layout gridLogin
 			
 /*			
@@ -572,6 +579,7 @@ public class Main extends Application {
 			//Método do botão OK - LOGIN
 			btnOk.setOnAction(e->{
 				pressedText.setText("Entrando...");
+				
 				//Necessário para receber o que está dentro das text field e passwordfield
 				checkUser = textFieldUserName.getText().toString();
 				checkPw = passwordFieldPassword.getText().toString();
@@ -606,6 +614,10 @@ public class Main extends Application {
 				}
 				
 			});
+			registar.setOnAction(e->{
+				layoutLogin.setCenter(FormLoginRegistar());
+				
+			});
 	/*		primaryStage.setMinHeight(180);
 			primaryStage.setMinWidth(330);
 			primaryStage.setMaxHeight(180);
@@ -616,6 +628,83 @@ public class Main extends Application {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+	/********************************************
+	 * Metodo que faz a criação da form de registar com 3 labels e text fields e 2 botões
+	 * @return
+	 */
+	private GridPane FormLoginRegistar(){
+		
+		
+		layoutRegistar.setAlignment(Pos.TOP_LEFT);
+		layoutRegistar.setHgap(5);
+		layoutRegistar.setVgap(5);
+//		layoutRegistar.setPadding(new Insets(25, 25, 25, 25));
+		Text registarText = new Text();
+		registarText.setText("Registar");
+		registarText.setFont(Font.font("Tahoma", FontWeight.MEDIUM, 20));
+		
+		Label lbUserName = new Label("Username");
+		TextField txtUserName = new TextField();
+		txtUserName.setPromptText("Introduza Username");
+		
+		Label lbPassword = new Label("Password");
+		PasswordField txtPassword = new PasswordField();
+		txtPassword.setPromptText("Introduza Password");
+		
+		Label lbEmail = new Label("Email");
+		TextField txtEmail = new TextField();
+		txtEmail.setPromptText("Introduza Email");
+		
+		layoutRegistar.add(registarText, 2, 0);
+		layoutRegistar.add(lbUserName, 2, 2);
+		layoutRegistar.add(lbPassword, 2, 3);
+		layoutRegistar.add(lbEmail, 2, 4);
+		
+		layoutRegistar.add(txtUserName, 3, 2);
+		layoutRegistar.add(txtPassword, 3, 3);
+		layoutRegistar.add(txtEmail, 3, 4);
+		
+		HBox hbox = new HBox(60); // spacing = 60
+        
+       // hbox.setAlignment(Pos.BOTTOM_RIGHT);
+		Button btnOk = new Button("OK");
+		Button btnCancel = new Button("Cancel");
+		
+		hbox.getChildren().addAll(btnOk, btnCancel);
+		
+		layoutRegistar.add(hbox, 3,5);
+		
+		btnOk.setOnAction(e->{
+			
+			if(txtUserName.getText().isEmpty() || txtPassword.getText().isEmpty() || txtEmail.getText().isEmpty()) {
+				alert.setTitle("Erro ao Registar!");
+				alert.setHeaderText("Preencha os Campos!");
+				alert.showAndWait();
+			}
+			else{
+				String user;
+				String password;
+				String email;
+				
+				user = txtUserName.getText();
+				password = txtPassword.getText();
+				email = txtEmail.getText();
+				
+				UtilsSQLConn.mySqlQueryRegistarLogin(user, password, email);
+				
+				alertInfo.setTitle("Sucesso!");
+				alertInfo.setHeaderText("Conta criada com sucesso");
+				alertInfo.setContentText("Adicionado à Base de Dados");
+				alertInfo.showAndWait();
+				layoutLogin.setCenter(gridLogin);
+			}
+		});
+		
+		btnCancel.setOnAction(e->{
+			layoutLogin.setCenter(gridLogin);
+		});
+		return layoutRegistar;
 	}
 	/*********************************************************************************************************************
 	 * Esta função é apresentada ao criar uma nova Insersão para a tabela
@@ -1313,5 +1402,6 @@ public class Main extends Application {
 		return layoutFormAlterarCliente;
 		
 	}
+	
 	
 }
