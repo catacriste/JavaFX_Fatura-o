@@ -13,8 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.security.auth.login.LoginContext;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
@@ -260,7 +258,12 @@ public class UtilsSQLConn {
 				
 			}
 			catch(SQLException ex){							// Apanha Erro da connection ou DML
-				Utils.alertBox("Finally", "Erro na ligação");
+				alert.setTitle("SQL INFO");
+				alert.setHeaderText("Erro na ligação");
+				alert.setContentText("");
+
+				alert.showAndWait();
+				//ex.printStackTrace();
 				shutdownConnection();
 			}				
 		}
