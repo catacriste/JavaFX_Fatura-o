@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: 10-Jul-2015 às 05:47
+-- Generation Time: 27-Jul-2015 às 05:22
 -- Versão do servidor: 5.6.17
 -- PHP Version: 5.5.12
 
@@ -72,7 +72,8 @@ INSERT INTO `fatura` (`codFatura`, `ClientecodCivil`, `DataDaFatura`, `Garantia`
 (3, 2, '25-01-2015', '3 Anos', 300),
 (4, 3, '31-01-2015', '5 Anos', 190),
 (6, 2, '1-02-2015', '1 Ano', 100),
-(8, 1, '31-06-2012', 'Expirada', 500);
+(8, 1, '31-06-2012', 'Expirada', 500),
+(9, 1, '27-07-2015', '2 anos', 100);
 
 -- --------------------------------------------------------
 
@@ -85,6 +86,40 @@ CREATE TABLE IF NOT EXISTS `fatura_produto` (
   `ProdutocodProduto` int(10) NOT NULL,
   PRIMARY KEY (`FaturacodFatura`,`ProdutocodProduto`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Extraindo dados da tabela `fatura_produto`
+--
+
+INSERT INTO `fatura_produto` (`FaturacodFatura`, `ProdutocodProduto`) VALUES
+(1, 2),
+(1, 3),
+(2, 1),
+(2, 2),
+(2, 3),
+(2, 7),
+(2, 9),
+(2, 10),
+(2, 11),
+(2, 12),
+(2, 13),
+(2, 14),
+(2, 15),
+(2, 16),
+(2, 17),
+(3, 2),
+(3, 3),
+(3, 17),
+(4, 1),
+(4, 2),
+(4, 3),
+(4, 7),
+(4, 12),
+(4, 17),
+(6, 2),
+(6, 9),
+(8, 2),
+(9, 10);
 
 -- --------------------------------------------------------
 
@@ -100,7 +135,7 @@ CREATE TABLE IF NOT EXISTS `produto` (
   `Preco` varchar(255) DEFAULT NULL,
   `Stock` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`codProduto`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
 
 --
 -- Extraindo dados da tabela `produto`
@@ -110,7 +145,16 @@ INSERT INTO `produto` (`codProduto`, `NomeProduto`, `Marca`, `DataValidade`, `Pr
 (1, 'Galaxy S6', 'Samsung', 'Não Tem', '599', '5000'),
 (2, 'Zenfone5', 'Asus', 'Nao Tem', '300', '2'),
 (3, 'HP Mini 210', 'HP', 'Nao tem', '150', '50'),
-(7, 'Spotify', 'Spotify', '3 Meses Premium', '0,99', '1000');
+(7, 'Spotify', 'Spotify', '3 Meses Premium', '0,99', '1000'),
+(9, 'Surface 3', 'Microsoft', 'Nao tem', '900', '0'),
+(10, '1life', 'c:stark', 'Nao tem', '59', '30'),
+(11, 'Grand Neo Duos', 'Samsung', 'Nao tem', '190', '2000'),
+(12, 'Ace 2', 'Samsung', 'Nao tem', '300', '7'),
+(13, 'PSP', 'Sony', 'Não tem', '90', '3'),
+(14, 'PlayStation 4', 'Sony', 'Não tem', '499', '200'),
+(15, 'Nintendo 3DS', 'Nintendo', 'Não tem', '150', '990'),
+(16, 'Wii U Basic Pack', 'Nintendo', 'Não tem', '199', '90'),
+(17, 'Nintendo Wii', 'Nintendo', 'Não tem', '120', '100');
 
 -- --------------------------------------------------------
 
@@ -137,7 +181,8 @@ INSERT INTO `utilizadores` (`user`, `codUtilizador`, `password`, `email`) VALUES
 ('severino100', 4, 'mariana', 'rubenfranciscos@gmail.com'),
 ('marianaCosta', 5, 'sporting', 'naoseioemaildamariana@qualquer.coisa'),
 ('teste', 6, '123', 'test@123.com'),
-('teste2', 7, 'benfica', 'teste2@gfdsfas.com');
+('teste2', 7, 'benfica', 'teste2@gfdsfas.com'),
+('', 8, '', '');
 
 --
 -- Constraints for dumped tables

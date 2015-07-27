@@ -234,13 +234,43 @@ public class UtilsSQLConn {
 				if(!query.isEmpty()){		// Se a query tiver comando sql
 					Statement stmt = conn.createStatement();
 					ResultSet rs = stmt.executeQuery(query);
+					ResultSet rs2;
+					Statement stmt2;
 					while(rs.next()){
 						Faturacao temp = new Faturacao();
 						temp.setCodFatura(rs.getInt(1));
 						temp.setClienteCodCivil(rs.getInt(2));
 						temp.setDataDaFatura(rs.getString(3));
 						temp.setGarantia(rs.getString(4));
-						temp.setTotal(rs.getDouble(5));
+						stmt2 = conn.createStatement();
+						temp.setTotal(0);
+						double preco = 0;
+						
+						try
+						{
+							
+							rs2 = stmt2.executeQuery("SELECT `FaturacodFatura`,`Preco`, `codProduto` FROM `fatura_produto`, `produto` WHERE FaturacodFatura = "+temp.getCodFatura()+" AND ProdutocodProduto = codProduto");
+							while(rs2.next()){
+								
+								try{
+									preco = Double.parseDouble(rs2.getString(2).replace(",","."));
+								}
+								catch(NumberFormatException e)
+								{
+									preco = 0;
+									e.printStackTrace();
+								}
+								temp.setTotal(temp.getTotal() + preco);
+								
+							}
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+						
+						
+						
 						listaFatura.add(temp);
 					
 					}
@@ -436,6 +466,86 @@ public class UtilsSQLConn {
 			}				
 		}
 		return listaCliente;
+	}
+
+	public static ObservableList<FaturaProduto> mySqlQweryFaturaProduto(String query){
+		ObservableList<FaturaProduto> listaFaturaProduto = FXCollections.observableArrayList();
+		try{
+			//Tenta ligar-se ao SGBD e à base de dados
+			Class.forName(MYSQL_JDBC_DRIVER).newInstance();
+			conn = DriverManager.getConnection(MYSQL_DB_URL, MYSQL_DB_USER, MYSQL_DB_PASS );
+			if(msgON){
+				alertInfo.setTitle("SQL INFO");
+				alertInfo.setHeaderText("Base dados aberta");
+				alertInfo.setContentText("");
+
+				alertInfo.showAndWait();
+			}
+		}
+		catch(SQLException ex){								// Apanha Erro da connection ou DML
+			//Utils.alertBox("layoutLeft", "Erro na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+		}
+		catch(ClassNotFoundException ex){					// Apanha Erro da Class.forName()
+			//Utils.alertBox("layoutLeft", "Erro no Driver");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+			
+		}
+		catch(Exception ex){								// Apanha todas as restantes Exceções
+		//	Utils.alertBox("layoutLeft", "Erro genérico na ligação");
+			alert.setTitle("SQL INFO");
+			alert.setHeaderText("Erro genérico na ligação");
+			alert.setContentText("");
+
+			alert.showAndWait();
+			ex.printStackTrace();
+		}
+		finally{
+			try{
+				// Se ligação com sucesso, executa a query
+				if(!query.isEmpty()){		// Se a query tiver comando sql
+					Statement stmt = conn.createStatement();
+					ResultSet rs = stmt.executeQuery(query);
+					while(rs.next()){
+						FaturaProduto temp = new FaturaProduto();
+						temp.setFaturaCodFatura(rs.getInt(1));
+						temp.setNomeProduto(rs.getString(2));
+						temp.setProdutoCodProduto(rs.getInt(3));
+						listaFaturaProduto.add(temp);
+						
+					}
+					if(msgON){
+						//Utils.alertBox("DB", "" + query +"\n CodCivil : " + temp.getCodCivil());
+						alertInfo.setTitle("SQL INFO");
+						alertInfo.setHeaderText("DB");
+						alertInfo.setContentText("Sucesso");
+
+						alertInfo.showAndWait();
+					}
+
+				}
+				shutdownConnection();
+				return listaFaturaProduto;
+				
+			}
+			catch(SQLException ex){							// Apanha Erro da connection ou DML
+				alert.setTitle("SQL INFO");
+				alert.setHeaderText("Erro na ligação");
+				alert.setContentText("FINALLY");
+
+				alert.showAndWait();
+				shutdownConnection();
+			}				
+		}
+		return listaFaturaProduto;
 	}
 	/* Executa uma query à base de dados de um SGBD MySQL, para verificar a existencia de uma PK
 	 * Recebe a qwery

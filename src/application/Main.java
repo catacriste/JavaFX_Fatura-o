@@ -5,19 +5,24 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -29,6 +34,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.util.Callback;
 //--------------------------SUMÁRIO--------------------------------------
 /*Aplicação destinada ao projeto de Faturação , para registar , alterar e eliminar faturas e produtos
  *Com acesso a uma base de dados , serão usados comandos SQL para inserir dados na base de dados eliminar e alterar
@@ -45,12 +51,15 @@ public class Main extends Application {
 	ObservableList<Faturacao> 	tabelaFaturas = FXCollections.observableArrayList();
 	ObservableList<Produto> 	tabelaProduto = FXCollections.observableArrayList();
 	ObservableList<Cliente> 	tabelaCliente = FXCollections.observableArrayList();
+	ObservableList<FaturaProduto> 	tabelaFaturaProduto = FXCollections.observableArrayList();
 	boolean msgOn = false;
 	//Outros
 	//Objeto para receber o indice selecionado na tabela
 	static Faturacao faturaSelecionada = null;
 	static Produto produtoSelecionado = null;
 	static Cliente clienteSelecionado = null;
+	static FaturaProduto faturaProdutoSelecionado = null;
+	int PosFaturaProduto;//Recebe a posição
 	//----------------------ALERT DIALOG---------------------
 	Alert alert = new Alert(AlertType.ERROR);
 	Alert alertInfo = new Alert(AlertType.INFORMATION);
@@ -72,8 +81,7 @@ public class Main extends Application {
 	BorderPane layoutCliente = new BorderPane();
 	GridPane layoutFormInserirCliente = new GridPane();
 	GridPane layoutFormAlterarCliente = new GridPane();
-	
-	
+
 	
 	BorderPane layoutRoot = new BorderPane();
 	
@@ -81,6 +89,14 @@ public class Main extends Application {
 	TableView<Faturacao> tableFatura = new TableView<>();
 	TableView<Produto> tableProdutos = new TableView<>();
 	TableView<Cliente> tableCliente = new TableView<>();
+	TableView<FaturaProduto> tableFaturaProduto = new TableView<>();
+	
+	//Janela Fatura -Produto
+	BorderPane layoutFaturaProduto = new BorderPane();
+	Scene sceneFaturaProduto = new Scene(layoutFaturaProduto);
+	Stage janelaFaturaProduto = new Stage(); 
+	ComboBox<Produto> cb;
+
 	
 	
 	public static void main(String[] args) {
@@ -137,7 +153,7 @@ public class Main extends Application {
 			
 			
 			
-			MenuBar menuBar = new MenuBar();
+			MenuBar menuBar = new MenuBar();			//Crição da menuBar
 			menuBar.setStyle("-fx-background-color: #0099FF");
 	        //Adiciona os menus ao menuBar
 	        menuBar.getMenus().addAll(menuFatura, menuProduto,menuCliente,msg);
@@ -171,6 +187,48 @@ public class Main extends Application {
 	        
 	        tableFatura.getColumns().addAll(colunaIDFaturacao,colunaClientecodCivil,colunaDataFatura,colunaGarantia,colunaTotal);
 	        tableFatura.setItems(tabelaFaturas);
+	        /*
+	        tableFatura.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+	            if (newSelection != null) {
+	                alertInfo.setContentText("ola " + newSelection.getCodFatura());
+	                alertInfo.showAndWait();
+	            }
+	        });*/
+	        
+	        janelaFaturaProduto.setMaxHeight(300);
+	        janelaFaturaProduto.setMaxWidth(400); 
+	        
+	        janelaFaturaProduto.setMinHeight(300);
+	        janelaFaturaProduto.setMinWidth(400); 
+	        
+	        
+	        //Método que determina event click em cada row da tabela fatur
+	        //If para apenas executar se ouver double click
+	        tableFatura.setRowFactory( tv -> {
+	        	//Define Modality para a janela FaturaProdutos
+	    		janelaFaturaProduto.initModality(Modality.APPLICATION_MODAL);
+	    		TableRow<Faturacao> rowSelecionda = new TableRow<>();
+	    		rowSelecionda.setTooltip(new Tooltip("Clique duas vezes para ver os produtos ou adicionar novos à fatura"));
+	            rowSelecionda.setOnMouseClicked(event -> {
+	            if (event.getClickCount() == 2 && (! rowSelecionda.isEmpty()) ) {
+	            	
+	            	//Para receber a row selecionada na tabela das taturas
+	            	ObservableList<Faturacao> itemSelecionado = tableFatura.getSelectionModel().getSelectedItems();
+	            	PosFaturaProduto = itemSelecionado.get(0).getCodFatura();
+	            	cb.setItems(UtilsSQLConn.mySqlQweryProduto("SELECT * FROM `produto`"));  //Select à db
+	            	//Select a tabela fatura-produto
+	            	tabelaFaturaProduto.setAll(UtilsSQLConn.mySqlQweryFaturaProduto("SELECT `FaturacodFatura`,`NomeProduto`, `codProduto` FROM `fatura_produto`, `produto` WHERE FaturacodFatura = "+PosFaturaProduto+" AND ProdutocodProduto = codProduto"));
+	            	
+	            	janelaFaturaProduto.setScene(sceneFaturaProduto);
+	            	janelaFaturaProduto.show();
+	
+	            }
+	            });
+	            	return rowSelecionda ;
+	        });
+	        tableFaturaProduto.setItems(tabelaFaturaProduto);
+	        
+	     
 	        
 	        //HBOX PARA OS BUTOES
 	        
@@ -186,11 +244,101 @@ public class Main extends Application {
 	       
 	        //Adiciona os butoes a HBOX e Hbox ao Buttom do Border Pane
 	        hBoxFatura.getChildren().addAll(btnInserirFatura,btnAlterarFatura,btnEliminarFatura);
-			
-	        
-	      //layoutFatura.getChildren().add(tableFatura);
+			//Adiciona ao layout
 			layoutFatura.setCenter(tableFatura);
 			layoutFatura.setBottom(hBoxFatura);
+			
+//---------------------------------------------------Table FATURA - PRODUTO
+			 //Coluna Do Indice
+	        TableColumn<FaturaProduto, Integer> colunaIDFaturacodFatura = new TableColumn<>("Índice");
+	        //Determina a que atributo corresponde na classe
+	        colunaIDFaturacodFatura.setCellValueFactory(new PropertyValueFactory<>("faturaCodFatura"));
+	        //Coluna do Nome do Produto
+	        TableColumn<FaturaProduto, String> colunaFaturaNomeProduto = new TableColumn<>("Nome Produto");
+	        //Determina a que atributo pretence à classe
+	        colunaFaturaNomeProduto.setCellValueFactory(new PropertyValueFactory<>("nomeProduto"));
+	    	colunaFaturaNomeProduto.setMinWidth(200);		 //Tamanho da coluna
+			
+			tableFaturaProduto.getColumns().addAll(colunaIDFaturacodFatura,colunaFaturaNomeProduto);
+			//HBOX Fatura-Produto
+			 HBox hBoxFaturaProduto = new HBox(10);
+			 hBoxFaturaProduto.setPadding(new Insets(10,0,10,10));
+			 hBoxFaturaProduto.setStyle("-fx-background-color: #005CB8");
+			 //Os 3 Butões , inserir ,alterar e eliminar
+		     Button btnInserirFaturaProduto = new Button("Inserir");
+		     Button btnAlterarFaturaProduto = new Button("Alterar");
+		     Button btnEliminarFaturaProduto = new Button("Eliminar");
+		       
+
+	        //Adiciona os butoes a HBOX e Hbox ao Buttom do Border Pane
+	       
+			//Combo box que faz quero à base de dados para receber a lista de itens a escoher
+		     
+	        cb = new ComboBox<>();
+	        //Tratamento de execções
+			try {
+				cb.setItems(UtilsSQLConn.mySqlQweryProduto("SELECT * FROM `produto`"));				//Faz select à tabela produtos
+				
+			}
+			//Catch Ponteiro Nulo (NullPointerException)
+			catch (NullPointerException e3) {
+				alert.setTitle("Exception ");
+				alert.setHeaderText("Erro de Ligação à BD");
+				alert.setContentText("Ponteiro Nulo");
+				alert.showAndWait();
+			}
+			
+			
+			cb.setCellFactory( new Callback<ListView<Produto>, ListCell<Produto>>() {				//List cell são cada célula com dados 
+						//Método override que lista cada célula																		
+		                @Override public ListCell<Produto> call(ListView<Produto> param) {
+		                    final ListCell<Produto> cell = new ListCell<Produto>() {
+		                        {
+		                            super.setPrefWidth(100);
+		                        }    
+		                        //Override que atualiza os itens
+		                        @Override public void updateItem(Produto item, 
+		                            boolean empty) {
+		                                super.updateItem(item, empty);
+		                                if (item != null) {
+		                                    setText(item.getNomeProduto());    			//Define o item que é o nome de cada produto
+		                                }
+		                                else {
+		                                    setText(null);
+		                                }
+		                            }
+		                };
+		                return cell;		//Retorna  A lista de itens
+		            }
+		        });
+			//Após selecionar atribui o campo do nome da Cbox com a selecionada na lista
+			cb.setButtonCell(new ListCell<Produto>(){
+
+				@Override
+				//Recebe Objeto e um booelan para atualizar o nome da celula principal da Combobox de acordo com a selecionada
+				protected void updateItem(Produto t, boolean bln) {
+					super.updateItem(t, bln);
+					if (bln) {
+	                    setText("");
+	                } else {
+	                	setText(t.getNomeProduto());						 //Atualiza com o nome do produto da classe Produto e tabela produto da bd
+	                }
+				}
+
+        		
+        	});
+			//Define o layout
+			layoutFaturaProduto.setCenter(tableFaturaProduto);
+			layoutFaturaProduto.setBottom(hBoxFaturaProduto);
+			
+			//Adiciona aos layouts HorizontalBox
+			hBoxFaturaProduto.getChildren().addAll(cb, btnInserirFaturaProduto, btnAlterarFaturaProduto, btnEliminarFaturaProduto);
+			
+			
+			
+			
+			
+			
 			
  //--------------------------------------------------TABLE DOS PRODUTOS----------------------------------------------------
 	      //TableViews - Criação das tabelas
@@ -244,7 +392,7 @@ public class Main extends Application {
 			
 	        
 	        
-			//layoutProduto.getChildren().add(tableProdutos);
+	        //Define o layout
 			layoutProduto.setCenter(tableProdutos);;
 			layoutProduto.setBottom(hBoxProduto);
 			
@@ -253,7 +401,6 @@ public class Main extends Application {
 		     
 		        //Coluna 
 		        TableColumn<Cliente, Integer> colunaIDCliente = new TableColumn<>("Código Civil");
-		       // colunaIDFaturacao.setMinWidth(0);		//largura em pixeis da coluna
 		        colunaIDCliente.setCellValueFactory(new PropertyValueFactory<>("codCivil"));
 		        
 		        //Coluna 
@@ -263,7 +410,6 @@ public class Main extends Application {
 		        
 		        //Coluna
 		        TableColumn<Cliente, Integer> colunaNIF = new TableColumn<>("NIF");
-		       // colunaMarca.setMinWidth(200);		//largura em pixeis da coluna
 		        colunaNIF.setCellValueFactory(new PropertyValueFactory<>("NIF"));
 		        
 		        // Coluna
@@ -273,23 +419,21 @@ public class Main extends Application {
 		        
 		        // Coluna
 		        TableColumn<Cliente, Integer> colunaNIB = new TableColumn<>("NIB");
-		        //colunaIDFaturacao.setMinWidth(100);		//largura em pixeis da coluna
 		        colunaNIB.setCellValueFactory(new PropertyValueFactory<>("NIB"));
 		        
 		        // Coluna
 		        TableColumn<Cliente, Integer> colunaNISS = new TableColumn<>("NISS");
-		        //colunaIDFaturacao.setMinWidth(100);		//largura em pixeis da coluna
 		        colunaNISS.setCellValueFactory(new PropertyValueFactory<>("NISS"));
 		        
 		        
-		        
+		        //Adiciona as colunas à TableView e seleciona os itens recebeidos na observableList
 		        tableCliente.getColumns().addAll(colunaIDCliente,colunaNome,colunaNIF,colunaMorada, colunaNIB , colunaNISS);
 		        tableCliente.setItems(tabelaCliente);
 			
 		        
 				//layoutCliente.getChildren().add(tableCliente);
 				
-				
+				//Hbox do Cliente
 				HBox hBoxCliente = new HBox(10);
 				hBoxCliente.setPadding(new Insets(10,0,10,250));
 				hBoxCliente.setStyle("-fx-background-color: #005CB8");
@@ -305,17 +449,9 @@ public class Main extends Application {
 				layoutCliente.setCenter(tableCliente);
 				layoutCliente.setBottom(hBoxCliente);
 			
-			
-			//Layout root e outros layouts ----
-	        
-	        //VBOX CENTRAL
-	       /* VBox layoutCenter = new VBox();
-	        layoutCenter.setPadding(new Insets(150,100,100,150));
-	        Button btnEntrar = new Button("Entrar");
-	        Button btnQuit = new Button("Sair");
-	        
-	        layoutCenter.getChildren().addAll(btnEntrar, btnQuit);*/
 //-------------------------------------------------------------LOGIN----------------------------------------------------------
+				
+		//---------------------------FORM LOGIN--------------------------------------
 					Text loginText = new Text();
 					loginText.setText("Log-In");
 					loginText.setFont(Font.font("Tahoma", FontWeight.MEDIUM, 20));
@@ -360,55 +496,24 @@ public class Main extends Application {
 			        Button registar = new Button("Registar");
 			        hBoxRegistar.getChildren().addAll(registar);
 			        gridLogin.add(hBoxRegistar, 1,6);
-			      //  layoutLogin.setBottom(hBoxRegistar);
+
+	//---------------------------FORM LOGIN END--------------------------------------	
 			        
-			        //hBoxRegistar.setAlignment(Pos.TOP_CENTER);
-			       
-	        //Layout gridLogin
-			
-/*			
-			HBox hbLoginText = new HBox(50);
-			hbLoginText.setPadding(new Insets(0,0,0,100));
-		//	hbLoginText.setStyle("");
-			
-			Text txtLogin = new Text("Log-In");
-			txtLogin.setFont(Font.font("Courier New", FontWeight.BOLD, 28));
-			hbLoginText.getChildren().add(txtLogin);
-	        GridPane layoutCenter = new GridPane(); 
-	        layoutLogin.setCenter(layoutCenter);
-	        layoutLogin.setTop(hbLoginText);
-	        //layoutLogin.setTop(hbLoginText);
-			layoutCenter.setPadding(new Insets(10, 50, 50, 50));
-			
-			
-	      //Labels
-			Label labelUserName = new Label("Username: ");
-			Label labelPassword = new Label("Password: ");
-			//TextFields
-			TextField textFieldUserName = new TextField();
-			PasswordField passwordFieldPassword = new PasswordField();
-			
-		//	layoutCenter.add(txtLogin, 2, 0);
-			layoutCenter.add(labelUserName, 1, 1);
-			layoutCenter.add(textFieldUserName, 2, 1);
-			layoutCenter.add(labelPassword, 1, 3);
-			layoutCenter.add(passwordFieldPassword, 2,3);
-			layoutCenter.add(btnOk, 2, 4);
-			
-			btnOk.setDefaultButton(true);*/
-			
+			        
 			//--------------------------------------------------SCENE E LAYOUT -------------------------------------------
 	        //Border Pane
 			
 			layoutRoot.setTop(menuBar);
-			//layoutRoot.setBottom(btnInserir);
-			//Scene ( Janela) Principal------
+			//Scenes principais do programa
 			Scene principal = new Scene(layoutRoot,700,500);
 			Scene login = new Scene(layoutLogin,300,250);
-		//	Scene fatura = new Scene(layoutFatura, 400,400);
-			
 			
 			//-------------------MENUS and BUTTONS EVENT HANDLERS ----------------------
+			/***
+			 * Métodos que definem o setonaction dos Menus , cada um faz literalmente a mesma coisa
+			 * 1º Define o layout correspondente
+			 * 2º Faz uma query A base de dados para preencher as tabelas de cada 1
+			 */
 			menuFaturaMostrar.setOnAction(e->{
 	        	layoutRoot.setCenter(layoutFatura);
 	        	primaryStage.setTitle("Faturação");
@@ -454,12 +559,18 @@ public class Main extends Application {
 	        });
 			
 //----------------------------------------------Eventos de Inserir , Alterar e Eliminar Faturas-----------------------------------------------------
+			/***
+			 * Métodos Inserir Alterar Eliminar Faturas
+			 * Cada um chama uma função que faz a insersão e alteração
+			 * Eliminar é feito aqui pois é facil e mais prático
+			 */
+			
+			//Inserir
 			btnInserirFatura.setOnAction(e->{
-				layoutRoot.setCenter(FormFaturacaoInserir());
+				layoutRoot.setCenter(FormFaturacaoInserir());		 //Chama o método
 			});
-			
-			
-			
+
+			//Alterar
 			btnAlterarFatura.setOnAction(e->{
 				try {
 					layoutRoot.setCenter(FormAlterarFaturacao());
@@ -471,7 +582,7 @@ public class Main extends Application {
 				}
 				
 			});
-			
+			//Eliminar
 			btnEliminarFatura.setOnAction(e->{
 				//Efetua a eliminação de dados numa tabela
 				int codFatura; 				//Variável para usar no comando
@@ -494,6 +605,79 @@ public class Main extends Application {
 				faturaSelecionada = null; // volta a meter o objeto vazio (null)
 				  
 			});
+//--------------------------------------------Inserir, Alterar e Eliminar Faturas-Produtos-------------------------------------------------
+			
+			/********************
+			 * Método do botão Inserir na Layout Fatura-Produto
+			 * O método Event Handler Usa uma observable list para receber  posição na lista da fatura e o codFatura 
+			 * Faz um insert na base de dados dependendo da fatura selecionda e o codigo de procudo selecionado na ComboBox
+			 */
+			btnInserirFaturaProduto.setOnAction(e->{
+				
+				try {
+					ObservableList<Faturacao> itemSelecionado = tableFatura.getSelectionModel().getSelectedItems();
+					faturaSelecionada = itemSelecionado.get(0);
+					int codProduto;
+					codProduto = cb.getSelectionModel().getSelectedItem().getCodProduto();
+					//SQL INSERT DATABSE -> fatura_produto
+					UtilsSQLConn.mySqlDml("INSERT INTO `fatura_produto`(`FaturacodFatura`, `ProdutocodProduto`) VALUES (" +  faturaSelecionada.getCodFatura() + ","+codProduto+")");
+					//Select na BD PARA atualizar a tabela Fatura-Produto com os novos produtos 
+					tabelaFaturaProduto.setAll(UtilsSQLConn.mySqlQweryFaturaProduto("SELECT `FaturacodFatura`,`NomeProduto`, `codProduto` FROM `fatura_produto`, `produto` WHERE FaturacodFatura = "+PosFaturaProduto+" AND ProdutocodProduto = codProduto"));
+				
+				} catch (NullPointerException e1) {
+					alert.setTitle("Exception ");
+					alert.setHeaderText("Não selecionou nenhum produto na comboBox");
+					alert.setContentText("É necessário ter produtos criados antes de adicionar produtos a esta fatura");
+					alert.showAndWait();
+				}
+			});
+		
+			btnAlterarFaturaProduto.setOnAction(e->{
+				
+				try {
+					ObservableList<Faturacao> faturaSelecionado = tableFatura.getSelectionModel().getSelectedItems();
+					faturaSelecionada = faturaSelecionado.get(0);
+					ObservableList<FaturaProduto> faturaProdutoSelected = tableFaturaProduto.getSelectionModel().getSelectedItems();
+					faturaProdutoSelecionado =  faturaProdutoSelected.get(0);
+					int codProduto;
+					codProduto = cb.getSelectionModel().getSelectedItem().getCodProduto();
+					//UPDATE `fatura_produto` SET`ProdutocodProduto`=[value-2] WHERE FaturacodFatura = 1 AND ProdutocodProduto = 1
+					//tabelaFaturaProduto.setAll(UtilsSQLConn.mySqlQweryFaturaProduto("SELECT `FaturacodFatura`,`NomeProduto` FROM `fatura_produto`, `produto` WHERE FaturacodFatura = "+PosFaturaProduto+" AND ProdutocodProduto = codProduto"));
+					UtilsSQLConn.mySqlDml("UPDATE `fatura_produto` SET`ProdutocodProduto`="+codProduto+" WHERE FaturacodFatura = "+faturaSelecionada.getCodFatura()+" AND ProdutocodProduto = " + faturaProdutoSelecionado.getProdutoCodProduto());
+					tabelaFaturaProduto.setAll(UtilsSQLConn.mySqlQweryFaturaProduto("SELECT `FaturacodFatura`,`NomeProduto`, `codProduto` FROM `fatura_produto`, `produto` WHERE FaturacodFatura = "+PosFaturaProduto+" AND ProdutocodProduto = codProduto"));
+					//System.out.println("SELECT `FaturacodFatura`,`NomeProduto`, `codProduto` FROM `fatura_produto`, `produto` WHERE FaturacodFatura = "+PosFaturaProduto+" AND ProdutocodProduto = codProduto");
+				} catch (NullPointerException e1) {
+					alert.setTitle("Exception ");
+					alert.setHeaderText("Não selecionou nenhum dado da tabela ou tabela está vazia");
+					alert.setContentText("");
+					alert.showAndWait();
+				}
+				faturaProdutoSelecionado = null;
+			});
+			
+			btnEliminarFaturaProduto.setOnAction(E->{
+				try {
+					ObservableList<FaturaProduto> faturaProdutoSelected = tableFaturaProduto.getSelectionModel().getSelectedItems();
+					faturaProdutoSelecionado =  faturaProdutoSelected.get(0);
+					//DELETE FROM `fatura_produto` WHERE FaturacodFatura = `x` AND ProdutocodProduto = `x`
+					UtilsSQLConn.mySqlDml("DELETE FROM `fatura_produto` WHERE FaturacodFatura = "+PosFaturaProduto+" AND ProdutocodProduto = "+faturaProdutoSelecionado.getProdutoCodProduto());
+//	UtilsSQLConn.mySqlDml("UPDATE `fatura_produto` SET`ProdutocodProduto`="+codProduto+" WHERE FaturacodFatura = "+faturaSelecionada.getCodFatura()+" AND ProdutocodProduto = " + faturaProdutoSelecionado.getProdutoCodProduto());
+					tabelaFaturaProduto.setAll(UtilsSQLConn.mySqlQweryFaturaProduto("SELECT `FaturacodFatura`,`NomeProduto`, `codProduto` FROM `fatura_produto`, `produto` WHERE FaturacodFatura = "+PosFaturaProduto+" AND ProdutocodProduto = codProduto"));
+				} catch (NullPointerException e1) {
+					alert.setTitle("Exception ");
+					alert.setHeaderText("Não selecionou nenhum dado da tabela ou tabela está vazia");
+					alert.setContentText("");
+					alert.showAndWait();
+				}
+				faturaProdutoSelecionado = null;
+				
+				
+			});
+			
+			janelaFaturaProduto.setOnCloseRequest(e->{
+				tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
+
+			});
 			
 //--------------------------------------------Inserir, Alterar e Eliminar Produtos-------------------------------------------------
 			//Metodo setOnAction Inserir
@@ -503,14 +687,14 @@ public class Main extends Application {
 			
 			//Meteodo setOnAction Alterar
 			btnAlterarProduto.setOnAction(e-> {
-				try {
+			//	try {
 					layoutRoot.setCenter(FormAlterarProduto());
-				} catch (NullPointerException e2) {
+			/*	} catch (NullPointerException e2) {
 					alert.setTitle("Exception ");
 					alert.setHeaderText("Não selecionou nenhum dado da tabela");
 					alert.setContentText("");
 					alert.showAndWait();
-				}
+				}*/
 				
 			});
 			
@@ -587,21 +771,35 @@ public class Main extends Application {
 				
 				//Compara (if) se a string checkUser equals(é igual) ao username e o mesmo para a password
 				//Se sim entra , muda de stage
-				
-				if(UtilsSQLConn.mySqlQueryVerificarLogin(checkUser, checkPw)){
-					primaryStage.setMinHeight(500);
-					primaryStage.setMinWidth(700);
-					primaryStage.setMaxHeight(564213);
-					primaryStage.setMaxWidth(415623);
-					primaryStage.setScene(principal);
-				}
-				//Senão dá um aviso
-				else{
-					alert.setTitle("Aviso !");
-					alert.setHeaderText("Ocorreu um erro ao efectuar o login");
-					alert.setContentText("Senha ou Password Incorretos");
+				try{
+					if(UtilsSQLConn.mySqlQueryVerificarLogin(checkUser, checkPw)){
+						primaryStage.setMinHeight(500);
+						primaryStage.setMinWidth(700);
+						primaryStage.setMaxHeight(564213);
+						primaryStage.setMaxWidth(415623);
+						primaryStage.setScene(principal);
+					}
+					//Senão dá um aviso
+					else{
+						alert.setTitle("Aviso !");
+						alert.setHeaderText("Ocorreu um erro ao efectuar o login");
+						alert.setContentText("Senha ou Password Incorretos");
+						alert.showAndWait();
+						passwordFieldPassword.setText("");
+					}
+					
+				} catch (NullPointerException e4){
+					alert.setTitle("Exception ");
+					alert.setHeaderText("Erro de ligação à BD ");
+					alert.setContentText("O ponteiro apontou para um NULL, Verifique a conexão ao MySQL, Verifique a conexão ao MySQL");
 					alert.showAndWait();
 				}
+				
+				
+				
+					
+					
+				
 				try {
 					
 					tabelaFaturas.setAll(UtilsSQLConn.mySqlQweryFaturacao("SELECT * FROM `fatura` WHERE 1"));
@@ -609,7 +807,7 @@ public class Main extends Application {
 				} catch (NullPointerException e2) {
 					alert.setTitle("Exception ");
 					alert.setHeaderText("Erro de ligação à BD ");
-					alert.setContentText("O ponteiro apontou para um NULL");
+					alert.setContentText("O ponteiro apontou para um NULL, Verifique a conexão ao MySQL");
 					alert.showAndWait();
 				}
 				
@@ -741,7 +939,9 @@ public class Main extends Application {
 		Label lbTotal = new Label("Total");
 		TextField txtTotal = new TextField();
 		txtTotal.setPromptText("Total da fatura");
-		txtTotal.setTooltip(new Tooltip("Total da fatura apresentado em euros"));
+		txtTotal.setTooltip(new Tooltip("Desabilitado, pois com a nova versão , o total é somado de acordo com o preço dos produtos"));
+		txtTotal.setText("0");
+		txtTotal.setDisable(true);
 		
 		
 		
@@ -852,7 +1052,10 @@ public class Main extends Application {
 				Label lbTotal = new Label("Total");
 				TextField txtTotal = new TextField();
 				txtTotal.setPromptText("Total da fatura");
-				txtTotal.setTooltip(new Tooltip("Total da fatura apresentado em euros"));
+				txtTotal.setTooltip(new Tooltip("Desabilitado, pois com a nova versão , o total é somado de acordo com o preço dos produtos"));
+			//	txtTotal.setText("0");
+				txtTotal.setDisable(true);
+				
 				
 				
 				Button btnOKFatura = new  Button("OK");
